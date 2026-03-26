@@ -1,0 +1,15 @@
+asgiref==3.11.1
+coverage==7.13.5
+Django==6.0.3
+django-cors-headers==4.9.0
+djangorestframework==3.17.1
+djangorestframework_simplejwt==5.5.1
+iniconfig==2.3.0
+packaging==26.0
+pluggy==1.6.0
+psycopg2-binary==2.9.11
+Pygments==2.19.2
+PyJWT==2.12.1
+pytest==9.0.2
+pytest-django==4.12.0
+sqlparse==0.5.5
