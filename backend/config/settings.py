@@ -32,7 +32,8 @@ INSTALLED_APPS = [
     "corsheaders",
 
     "users.apps.UsersConfig",
-    # "tasks.apps.TasksConfig",
+    "tasks.apps.TasksConfig",
+    "categories.apps.CategoriesConfig"
 ]
 
 
