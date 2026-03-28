@@ -5,7 +5,7 @@ from .models import Category
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ("name", "user", "color", "created_at")
-    list_filter = ("user",)
-    search_fields = ("name", "user__username")
-    search_fields = ("name", "user__username")
+    list_display = ("name", "owner", "color", "created_at")
+    list_filter = ("owner",)
+    search_fields = ("name", "owner__username")
+    search_fields = ("name", "owner__username")
