@@ -12,9 +12,10 @@ interface KanbanColumnProps {
   status: Task['status']
   accentColor: string
   onEdit: (task: Task) => void
+  onView: (task: Task) => void
 }
 
-export function KanbanColumn({ title, status, accentColor, onEdit }: KanbanColumnProps) {
+export function KanbanColumn({ title, status, accentColor, onEdit, onView }: KanbanColumnProps) {
   const [filter, setFilter] = useState<FilterState>({
     search: '',
     sortBy: 'createdAt',
@@ -134,6 +135,7 @@ export function KanbanColumn({ title, status, accentColor, onEdit }: KanbanColum
               task={task}
               category={categories.find((c) => c.id === task.categoryId)}
               onEdit={onEdit}
+              onView={onView}
             />
           ))
         )}

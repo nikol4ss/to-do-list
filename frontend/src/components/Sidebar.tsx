@@ -12,6 +12,7 @@ import {
 } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
 import { useTheme } from '../hooks/useTheme'
+import { ConfirmDialog } from './ConfirmDialog'
 import { cn } from '../lib/utils'
 
 const navItems = [
@@ -27,6 +28,7 @@ function SidebarContent({ onClose }: SidebarProps) {
   const { user, logout } = useAuth()
   const { theme, toggle } = useTheme()
   const navigate = useNavigate()
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
 
   function handleLogout() {
     logout()
@@ -110,13 +112,25 @@ function SidebarContent({ onClose }: SidebarProps) {
 
         {/* Logout */}
         <button
-          onClick={handleLogout}
+          onClick={() => setShowLogoutConfirm(true)}
           className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium text-sidebar-foreground/60 hover:bg-red-500/10 hover:text-red-400 transition-all w-full text-left"
         >
           <LogOut size={18} />
           Sair
         </button>
       </div>
+
+      {/* Logout confirmation */}
+      <ConfirmDialog
+        isOpen={showLogoutConfirm}
+        title="Sair da conta"
+        description="Tem certeza que deseja sair? Você precisará fazer login novamente."
+        confirmLabel="Sair"
+        cancelLabel="Cancelar"
+        variant="destructive"
+        onConfirm={handleLogout}
+        onCancel={() => setShowLogoutConfirm(false)}
+      />
     </nav>
   )
 }

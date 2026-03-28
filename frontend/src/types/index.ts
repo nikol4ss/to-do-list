@@ -8,11 +8,21 @@ export interface Category {
   ownerId: string
 }
 
+export interface Priority {
+  id: string
+  name: string
+  level: number
+  ownerId: string
+}
+
 export interface User {
   id: string
   name: string
+  surname?: string
+  username?: string
   email: string
   avatarUrl?: string
+  notificationsEnabled?: boolean
 }
 
 export interface Task {

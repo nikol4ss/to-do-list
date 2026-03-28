@@ -21,6 +21,11 @@ export default function DashboardPage() {
     setModalOpen(true)
   }
 
+  function openView(task: Task) {
+    setEditTask(task)
+    setModalOpen(true)
+  }
+
   function closeModal() {
     setModalOpen(false)
     setEditTask(null)
@@ -60,18 +65,21 @@ export default function DashboardPage() {
             status="open"
             accentColor="#3b82f6"
             onEdit={openEdit}
+            onView={openView}
           />
           <KanbanColumn
             title="Concluídas"
             status="completed"
             accentColor="#10b981"
             onEdit={openEdit}
+            onView={openView}
           />
           <KanbanColumn
             title="Compartilhadas"
             status="shared"
             accentColor="#8b5cf6"
             onEdit={openEdit}
+            onView={openView}
           />
         </div>
       </div>

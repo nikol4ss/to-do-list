@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Pencil, Trash2, Plus, Check, X } from 'lucide-react'
+import { Pencil, Trash2, Plus, Check, X, Mail } from 'lucide-react'
 import { useTasks } from '../hooks/useTasks'
 import { useAuth } from '../hooks/useAuth'
 import { useToast } from '../hooks/useToast'
@@ -12,6 +12,8 @@ const PRESET_COLORS = [
   '#2b6cb0', '#c05621',
 ]
 
+const SYSTEM_VERSION = '1.0.0'
+
 export default function ProfilePage() {
   const { user, updateUser } = useAuth()
   const { categories, createCategory, updateCategory, deleteCategory } = useTasks()
@@ -19,7 +21,10 @@ export default function ProfilePage() {
 
   // Profile form
   const [profileName, setProfileName] = useState(user?.name ?? '')
+  const [profileSurname, setProfileSurname] = useState(user?.surname ?? '')
+  const [profileUsername, setProfileUsername] = useState(user?.username ?? '')
   const [profileEmail, setProfileEmail] = useState(user?.email ?? '')
+  const [notificationsEnabled, setNotificationsEnabled] = useState(user?.notificationsEnabled ?? false)
   const [isSavingProfile, setIsSavingProfile] = useState(false)
   const [profileErrors, setProfileErrors] = useState<{ name?: string; email?: string }>({})
 
@@ -47,12 +52,24 @@ export default function ProfilePage() {
     if (!validateProfile()) return
     setIsSavingProfile(true)
     try {
-      const updated = await authService.updateProfile({ name: profileName, email: profileEmail })
+      const updated = await authService.updateProfile({
+        name: profileName,
+        surname: profileSurname,
+        username: profileUsername,
+        email: profileEmail,
+        notificationsEnabled,
+      })
       updateUser(updated)
       addToast('Perfil atualizado com sucesso!', 'success')
     } catch {
       // For demo mode, just update locally
-      updateUser({ name: profileName, email: profileEmail })
+      updateUser({
+        name: profileName,
+        surname: profileSurname,
+        username: profileUsername,
+        email: profileEmail,
+        notificationsEnabled,
+      })
       addToast('Perfil atualizado!', 'success')
     } finally {
       setIsSavingProfile(false)
@@ -81,15 +98,15 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="flex flex-col gap-6 max-w-2xl font-sans animate-fade-in">
+    <div className="flex flex-col gap-6 max-w-3xl font-sans animate-fade-in"
       {/* Page header */}
       <div>
         <h1 className="text-2xl font-bold text-foreground text-balance">Perfil</h1>
-        <p className="text-muted-foreground text-sm mt-0.5">Gerencie suas informações e categorias.</p>
+        <p className="text-muted-foreground text-sm mt-0.5">Gerencie suas informações, categorias e preferências.</p>
       </div>
 
       {/* Profile section */}
-      <section className="bg-card border border-border rounded-xl p-6 shadow-sm">
+      <section className="bg-card border border-border rounded-md p-6 shadow-sm">
         <h2 className="text-base font-semibold text-foreground mb-5">Informações pessoais</h2>
 
         {/* Avatar */}
@@ -109,7 +126,7 @@ export default function ProfilePage() {
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
               <label htmlFor="profile-name" className="block text-sm font-medium text-foreground mb-1.5">
-                Nome completo
+                Nome
               </label>
               <input
                 id="profile-name"
@@ -122,6 +139,30 @@ export default function ProfilePage() {
                 )}
               />
               {profileErrors.name && <p className="mt-1 text-xs text-destructive">{profileErrors.name}</p>}
+            </div>
+            <div>
+              <label htmlFor="profile-surname" className="block text-sm font-medium text-foreground mb-1.5">
+                Sobrenome
+              </label>
+              <input
+                id="profile-surname"
+                type="text"
+                value={profileSurname}
+                onChange={(e) => setProfileSurname(e.target.value)}
+                className="w-full px-3 py-2.5 rounded-md border border-border text-sm bg-input text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary"
+              />
+            </div>
+            <div>
+              <label htmlFor="profile-username" className="block text-sm font-medium text-foreground mb-1.5">
+                Usuário
+              </label>
+              <input
+                id="profile-username"
+                type="text"
+                value={profileUsername}
+                onChange={(e) => setProfileUsername(e.target.value)}
+                className="w-full px-3 py-2.5 rounded-md border border-border text-sm bg-input text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary"
+              />
             </div>
             <div>
               <label htmlFor="profile-email" className="block text-sm font-medium text-foreground mb-1.5">
@@ -140,7 +181,26 @@ export default function ProfilePage() {
               {profileErrors.email && <p className="mt-1 text-xs text-destructive">{profileErrors.email}</p>}
             </div>
           </div>
-          <div className="flex justify-end">
+
+          {/* Notifications toggle */}
+          <div className="flex items-center gap-3 px-4 py-3 rounded-md bg-muted/50 border border-border">
+            <input
+              id="notifications-enabled"
+              type="checkbox"
+              checked={notificationsEnabled}
+              onChange={(e) => setNotificationsEnabled(e.target.checked)}
+              className="w-4 h-4 rounded border-border cursor-pointer"
+            />
+            <label htmlFor="notifications-enabled" className="flex items-center gap-2 flex-1 text-sm font-medium text-foreground cursor-pointer">
+              <Mail size={14} className="text-muted-foreground" />
+              Receber notificações por e-mail
+            </label>
+          </div>
+
+          <div className="flex justify-end gap-3">
+            <div className="text-xs text-muted-foreground">
+              Versão do sistema: <span className="font-mono font-medium">{SYSTEM_VERSION}</span>
+            </div>
             <button
               type="submit"
               disabled={isSavingProfile}
@@ -156,11 +216,11 @@ export default function ProfilePage() {
       </section>
 
       {/* Categories section */}
-      <section className="bg-card border border-border rounded-xl p-6 shadow-sm">
+      <section className="bg-card border border-border rounded-md p-6 shadow-sm">
         <h2 className="text-base font-semibold text-foreground mb-5">Categorias</h2>
 
         {/* Add new category */}
-        <div className="flex items-end gap-3 mb-5 p-4 bg-muted/50 rounded-lg border border-border">
+        <div className="flex items-end gap-3 mb-5 p-4 bg-muted/50 rounded-md border border-border">
           <div className="flex-1">
             <label htmlFor="new-cat-name" className="block text-xs font-medium text-foreground mb-1">
               Nome da categoria
@@ -226,7 +286,7 @@ export default function ProfilePage() {
             {categories.map((cat) => (
               <li
                 key={cat.id}
-                className="flex items-center gap-3 px-4 py-3 rounded-lg border border-border bg-background hover:bg-muted/30 transition-colors"
+                className="flex items-center gap-3 px-4 py-3 rounded-md border border-border bg-background hover:bg-muted/30 transition-colors"
               >
                 {editCatId === cat.id ? (
                   <>

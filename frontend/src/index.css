@@ -3,49 +3,49 @@
 @tailwind utilities;
 
 :root {
-  --color-background: #f5f7fa;
-  --color-foreground: #1a2332;
-  --color-card: #ffffff;
-  --color-card-foreground: #1a2332;
-  --color-border: #e2e8f0;
+  --color-background: #ffffff;
+  --color-foreground: #1a1a1a;
+  --color-card: #f8f9fa;
+  --color-card-foreground: #1a1a1a;
+  --color-border: #e5e5e5;
   --color-input: #ffffff;
-  --color-primary: #0f4c75;
+  --color-primary: #014E83;
   --color-primary-foreground: #ffffff;
-  --color-secondary: #1a8fa0;
+  --color-secondary: #0a3d6a;
   --color-secondary-foreground: #ffffff;
-  --color-muted: #edf2f7;
-  --color-muted-foreground: #718096;
-  --color-accent: #e8f4f8;
-  --color-accent-foreground: #0f4c75;
-  --color-destructive: #e53e3e;
-  --color-sidebar: #0f4c75;
-  --color-sidebar-foreground: #e8f4f8;
-  --color-sidebar-border: #1a5f8a;
-  --color-sidebar-muted: #1a5f8a;
-  --radius: 8px;
+  --color-muted: #f0f0f0;
+  --color-muted-foreground: #666666;
+  --color-accent: #e8f2f8;
+  --color-accent-foreground: #014E83;
+  --color-destructive: #d32f2f;
+  --color-sidebar: #014E83;
+  --color-sidebar-foreground: #ffffff;
+  --color-sidebar-border: #0a3d6a;
+  --color-sidebar-muted: #0a3d6a;
+  --radius: 6px;
 }
 
 .dark {
-  --color-background: #0d1b2a;
-  --color-foreground: #e8f4f8;
-  --color-card: #1a2a3a;
-  --color-card-foreground: #e8f4f8;
-  --color-border: #2d3f50;
-  --color-input: #1a2a3a;
-  --color-primary: #1a8fa0;
+  --color-background: #0f0f0f;
+  --color-foreground: #f5f5f5;
+  --color-card: #1a1a1a;
+  --color-card-foreground: #f5f5f5;
+  --color-border: #333333;
+  --color-input: #262626;
+  --color-primary: #ED7915;
   --color-primary-foreground: #ffffff;
-  --color-secondary: #0f4c75;
-  --color-secondary-foreground: #e8f4f8;
-  --color-muted: #1e3045;
-  --color-muted-foreground: #8ba8bf;
-  --color-accent: #1e3045;
-  --color-accent-foreground: #7ec8d8;
-  --color-destructive: #fc8181;
-  --color-sidebar: #0a1929;
-  --color-sidebar-foreground: #b8d4e8;
-  --color-sidebar-border: #1a2a3a;
-  --color-sidebar-muted: #1a2a3a;
-  --radius: 8px;
+  --color-secondary: #d96d0d;
+  --color-secondary-foreground: #ffffff;
+  --color-muted: #2a2a2a;
+  --color-muted-foreground: #999999;
+  --color-accent: #2a2000;
+  --color-accent-foreground: #ED7915;
+  --color-destructive: #ff5252;
+  --color-sidebar: #0f0f0f;
+  --color-sidebar-foreground: #f5f5f5;
+  --color-sidebar-border: #262626;
+  --color-sidebar-muted: #262626;
+  --radius: 6px;
 }
 
 * {
