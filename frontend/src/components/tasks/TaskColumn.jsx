@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useTasks } from '../../context/TaskContext';
 import { TaskCard } from './TaskCard';
-import { Button } from '../ui/Button';
 import { Select } from '../ui/Input';
 import { ChevronLeftIcon, ChevronRightIcon, FilterIcon } from '../ui/Icons';
 import styles from './TaskColumn.module.css';
@@ -12,9 +11,10 @@ export function TaskColumn({
   statusFilter, 
   filterByShared = false,
   onEditTask,
+  onViewDetails,
   color = 'var(--primary)'
 }) {
-  const { tasks, categories, filter, setFilter } = useTasks();
+  const { tasks, categories, filter } = useTasks();
   const [currentPage, setCurrentPage] = useState(1);
   const [localFilter, setLocalFilter] = useState({
     category: 'all',
@@ -116,6 +116,7 @@ export function TaskColumn({
               key={task.id} 
               task={task} 
               onEdit={onEditTask}
+              onViewDetails={onViewDetails}
             />
           ))
         )}

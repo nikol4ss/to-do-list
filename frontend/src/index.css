@@ -1,34 +1,39 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-  /* Primary Colors - Inspired by AdviceHealth */
-  --primary: #0891b2;
-  --primary-hover: #0e7490;
-  --primary-light: #ecfeff;
+  /* Primary Colors - Fixed Palette */
+  --primary: #014E83;
+  --primary-hover: #013d66;
+  --primary-light: rgba(1, 78, 131, 0.1);
   
-  /* Secondary/Accent */
-  --accent: #10b981;
-  --accent-hover: #059669;
-  --accent-light: #d1fae5;
+  /* Secondary/Accent - Orange */
+  --accent: #ED7915;
+  --accent-hover: #d66a0f;
+  --accent-light: rgba(237, 121, 21, 0.1);
   
-  /* Neutrals */
+  /* Tertiary - Teal */
+  --tertiary: #008F9D;
+  --tertiary-hover: #007a86;
+  --tertiary-light: rgba(0, 143, 157, 0.1);
+  
+  /* Neutrals - Light Mode */
   --background: #ffffff;
   --surface: #f8fafc;
   --surface-hover: #f1f5f9;
   --border: #e2e8f0;
   --border-focus: #94a3b8;
   
-  /* Text */
+  /* Text - Light Mode */
   --text-primary: #0f172a;
   --text-secondary: #475569;
   --text-muted: #94a3b8;
   --text-inverse: #ffffff;
   
   /* Status Colors */
-  --success: #10b981;
-  --warning: #f59e0b;
-  --error: #ef4444;
-  --info: #3b82f6;
+  --success: #008F9D;
+  --warning: #ED7915;
+  --error: #dc2626;
+  --info: #014E83;
   
   /* Shadows */
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
@@ -53,24 +58,33 @@
 
 /* Dark Theme */
 [data-theme="dark"] {
-  --primary: #22d3ee;
-  --primary-hover: #67e8f9;
-  --primary-light: rgba(34, 211, 238, 0.1);
+  --primary: #4a9fd4;
+  --primary-hover: #6bb3e0;
+  --primary-light: rgba(74, 159, 212, 0.15);
   
-  --accent: #34d399;
-  --accent-hover: #6ee7b7;
-  --accent-light: rgba(52, 211, 153, 0.1);
+  --accent: #f59942;
+  --accent-hover: #f7ad64;
+  --accent-light: rgba(245, 153, 66, 0.15);
   
-  --background: #0f172a;
-  --surface: #1e293b;
-  --surface-hover: #334155;
-  --border: #334155;
-  --border-focus: #475569;
+  --tertiary: #2abac9;
+  --tertiary-hover: #4fc9d5;
+  --tertiary-light: rgba(42, 186, 201, 0.15);
+  
+  --background: #0c1929;
+  --surface: #152238;
+  --surface-hover: #1e3049;
+  --border: #1e3049;
+  --border-focus: #2d4563;
   
   --text-primary: #f1f5f9;
   --text-secondary: #cbd5e1;
   --text-muted: #64748b;
-  --text-inverse: #0f172a;
+  --text-inverse: #0c1929;
+  
+  --success: #2abac9;
+  --warning: #f59942;
+  --error: #ef4444;
+  --info: #4a9fd4;
   
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
   --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.4), 0 1px 2px -1px rgb(0 0 0 / 0.4);
@@ -178,6 +192,17 @@ a:hover {
   from {
     opacity: 0;
     transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
   }
   to {
     opacity: 1;

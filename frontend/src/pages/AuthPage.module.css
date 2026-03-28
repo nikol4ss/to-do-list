@@ -38,7 +38,7 @@
   flex-direction: column;
   justify-content: center;
   padding: 3rem;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+  background-color: #014E83;
   color: white;
 }
 
@@ -52,7 +52,7 @@
   justify-content: center;
   width: 72px;
   height: 72px;
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(255, 255, 255, 0.15);
   border-radius: var(--radius-lg);
   margin-bottom: 1.5rem;
 }
@@ -88,7 +88,7 @@
   justify-content: center;
   width: 48px;
   height: 48px;
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(255, 255, 255, 0.15);
   border-radius: var(--radius);
   flex-shrink: 0;
 }
@@ -157,7 +157,7 @@
 }
 
 .toggleButton {
-  color: var(--primary);
+  color: var(--accent);
   font-weight: 500;
   background: none;
   border: none;
@@ -167,7 +167,7 @@
 }
 
 .toggleButton:hover {
-  color: var(--primary-hover);
+  color: var(--accent-hover);
   text-decoration: underline;
 }
 

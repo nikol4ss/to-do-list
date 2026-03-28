@@ -30,8 +30,13 @@
 }
 
 .tab.active {
-  color: var(--primary);
-  background-color: var(--primary-light);
+  color: #014E83;
+  background-color: rgba(1, 78, 131, 0.1);
+}
+
+[data-theme="dark"] .tab.active {
+  color: #4a9fd4;
+  background-color: rgba(74, 159, 212, 0.15);
 }
 
 .content {
@@ -84,11 +89,16 @@
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background-color: var(--primary);
+  background-color: #014E83;
   color: white;
   font-size: 1.5rem;
   font-weight: 600;
   flex-shrink: 0;
+}
+
+[data-theme="dark"] .avatar {
+  background-color: #4a9fd4;
+  color: #0c1929;
 }
 
 .avatarSection h3 {
@@ -189,8 +199,8 @@
 }
 
 .deleteButton:hover {
-  background-color: rgba(239, 68, 68, 0.1);
-  color: var(--error);
+  background-color: rgba(220, 38, 38, 0.1);
+  color: #dc2626;
 }
 
 .emptyState {

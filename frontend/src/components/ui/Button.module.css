@@ -23,12 +23,21 @@
 
 /* Variants */
 .primary {
-  background-color: var(--primary);
-  color: var(--text-inverse);
+  background-color: #014E83;
+  color: white;
 }
 
 .primary:hover:not(:disabled) {
-  background-color: var(--primary-hover);
+  background-color: #013d66;
+}
+
+[data-theme="dark"] .primary {
+  background-color: #4a9fd4;
+  color: #0c1929;
+}
+
+[data-theme="dark"] .primary:hover:not(:disabled) {
+  background-color: #6bb3e0;
 }
 
 .secondary {
@@ -53,21 +62,30 @@
 }
 
 .danger {
-  background-color: var(--error);
-  color: var(--text-inverse);
+  background-color: #dc2626;
+  color: white;
 }
 
 .danger:hover:not(:disabled) {
-  background-color: #dc2626;
+  background-color: #b91c1c;
 }
 
 .success {
-  background-color: var(--success);
-  color: var(--text-inverse);
+  background-color: #008F9D;
+  color: white;
 }
 
 .success:hover:not(:disabled) {
-  background-color: var(--accent-hover);
+  background-color: #007a86;
+}
+
+[data-theme="dark"] .success {
+  background-color: #2abac9;
+  color: #0c1929;
+}
+
+[data-theme="dark"] .success:hover:not(:disabled) {
+  background-color: #4fc9d5;
 }
 
 /* Sizes */

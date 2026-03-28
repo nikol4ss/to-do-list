@@ -31,6 +31,7 @@
 .header {
   display: flex;
   gap: 0.75rem;
+  align-items: flex-start;
 }
 
 .checkbox {
@@ -53,8 +54,8 @@
 }
 
 .checkbox.checked {
-  border-color: var(--success);
-  background-color: var(--success);
+  border-color: var(--tertiary);
+  background-color: var(--tertiary);
   color: white;
   animation: checkmark 0.3s ease-out;
 }
@@ -81,6 +82,24 @@
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+.viewDetailsButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius);
+  color: var(--text-muted);
+  background-color: var(--surface);
+  flex-shrink: 0;
+  transition: all var(--transition);
+}
+
+.viewDetailsButton:hover {
+  background-color: var(--primary-light);
+  color: var(--primary);
 }
 
 .meta {
@@ -150,7 +169,7 @@
 }
 
 .deleteButton:hover {
-  background-color: rgba(239, 68, 68, 0.1);
+  background-color: rgba(220, 38, 38, 0.1);
   color: var(--error);
 }
 

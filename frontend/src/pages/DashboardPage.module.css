@@ -82,8 +82,13 @@
 
 .searchInput:focus {
   outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px var(--primary-light);
+  border-color: #014E83;
+  box-shadow: 0 0 0 3px rgba(1, 78, 131, 0.15);
+}
+
+[data-theme="dark"] .searchInput:focus {
+  border-color: #4a9fd4;
+  box-shadow: 0 0 0 3px rgba(74, 159, 212, 0.15);
 }
 
 .kanban {

@@ -4,9 +4,9 @@ import { Sidebar } from '../components/layout/Sidebar';
 import { StatsOverview } from '../components/tasks/StatsOverview';
 import { TaskColumn } from '../components/tasks/TaskColumn';
 import { TaskForm } from '../components/tasks/TaskForm';
+import { TaskDetailPanel } from '../components/tasks/TaskDetailPanel';
 import { ProfilePage } from './ProfilePage';
 import { Button } from '../components/ui/Button';
-import { Input } from '../components/ui/Input';
 import { 
   PlusIcon, 
   SearchIcon, 
@@ -23,6 +23,7 @@ export function DashboardPage() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
   const [formMode, setFormMode] = useState('create');
+  const [selectedTask, setSelectedTask] = useState(null);
 
   const handleOpenForm = () => {
     setEditingTask(null);
@@ -40,6 +41,14 @@ export function DashboardPage() {
     setIsFormOpen(false);
     setEditingTask(null);
     setFormMode('create');
+  };
+
+  const handleViewTaskDetails = (task) => {
+    setSelectedTask(task);
+  };
+
+  const handleCloseTaskDetails = () => {
+    setSelectedTask(null);
   };
 
   const handleSearch = (e) => {
@@ -84,21 +93,24 @@ export function DashboardPage() {
             icon={ClipboardIcon}
             statusFilter="open"
             onEditTask={handleEditTask}
-            color="#0891b2"
+            onViewDetails={handleViewTaskDetails}
+            color="#014E83"
           />
           <TaskColumn
             title="Concluidas"
             icon={CheckCircleIcon}
             statusFilter="completed"
             onEditTask={handleEditTask}
-            color="#10b981"
+            onViewDetails={handleViewTaskDetails}
+            color="#008F9D"
           />
           <TaskColumn
             title="Compartilhadas"
             icon={UsersIcon}
             filterByShared={true}
             onEditTask={handleEditTask}
-            color="#8b5cf6"
+            onViewDetails={handleViewTaskDetails}
+            color="#ED7915"
           />
         </div>
 
@@ -108,6 +120,14 @@ export function DashboardPage() {
           task={editingTask}
           mode={formMode}
         />
+
+        {selectedTask && (
+          <TaskDetailPanel
+            task={selectedTask}
+            onClose={handleCloseTaskDetails}
+            onEdit={handleEditTask}
+          />
+        )}
       </>
     );
   };

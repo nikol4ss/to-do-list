@@ -59,7 +59,11 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  color: var(--primary);
+  color: #014E83;
+}
+
+[data-theme="dark"] .logo {
+  color: #4a9fd4;
 }
 
 .logoText {
@@ -97,8 +101,13 @@
 }
 
 .navItem.active {
-  background-color: var(--primary-light);
-  color: var(--primary);
+  background-color: rgba(1, 78, 131, 0.1);
+  color: #014E83;
+}
+
+[data-theme="dark"] .navItem.active {
+  background-color: rgba(74, 159, 212, 0.15);
+  color: #4a9fd4;
 }
 
 .footer {
@@ -140,11 +149,16 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background-color: var(--primary);
+  background-color: #014E83;
   color: white;
   font-weight: 600;
   font-size: 0.875rem;
   flex-shrink: 0;
+}
+
+[data-theme="dark"] .avatar {
+  background-color: #4a9fd4;
+  color: #0c1929;
 }
 
 .userInfo {
@@ -178,7 +192,7 @@
   width: 100%;
   padding: 0.625rem 1rem;
   border-radius: var(--radius);
-  color: var(--error);
+  color: #dc2626;
   font-size: 0.875rem;
   font-weight: 500;
   text-align: left;
@@ -186,7 +200,7 @@
 }
 
 .logoutButton:hover {
-  background-color: rgba(239, 68, 68, 0.1);
+  background-color: rgba(220, 38, 38, 0.1);
 }
 
 @media (min-width: 768px) {

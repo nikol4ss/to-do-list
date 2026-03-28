@@ -7,13 +7,14 @@ import {
   EditIcon, 
   ShareIcon,
   CalendarIcon,
-  UsersIcon
+  UsersIcon,
+  EyeIcon
 } from '../ui/Icons';
 import styles from './TaskCard.module.css';
 
-export function TaskCard({ task, onEdit }) {
+export function TaskCard({ task, onEdit, onViewDetails }) {
   const { categories, toggleTaskStatus, deleteTask } = useTasks();
-  const { success, error } = useToast();
+  const { success } = useToast();
   const [isAnimating, setIsAnimating] = useState(false);
 
   const category = categories.find(c => c.id === task.categoryId);
@@ -34,9 +35,9 @@ export function TaskCard({ task, onEdit }) {
   };
 
   const priorityColors = {
-    high: '#ef4444',
-    medium: '#f59e0b',
-    low: '#10b981',
+    high: '#dc2626',
+    medium: '#ED7915',
+    low: '#008F9D',
   };
 
   const priorityLabels = {
@@ -64,6 +65,15 @@ export function TaskCard({ task, onEdit }) {
             <p className={styles.description}>{task.description}</p>
           )}
         </div>
+
+        {/* View Details Button */}
+        <button
+          className={styles.viewDetailsButton}
+          onClick={() => onViewDetails(task)}
+          aria-label="Ver detalhes da tarefa"
+        >
+          <EyeIcon size={18} />
+        </button>
       </div>
 
       <div className={styles.meta}>
@@ -78,7 +88,7 @@ export function TaskCard({ task, onEdit }) {
         
         <span 
           className={styles.priority}
-          style={{ backgroundColor: `${priorityColors[task.priority]}20`, color: priorityColors[task.priority] }}
+          style={{ backgroundColor: `${priorityColors[task.priority]}15`, color: priorityColors[task.priority] }}
         >
           {priorityLabels[task.priority]}
         </span>
