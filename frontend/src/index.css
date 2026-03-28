@@ -9,19 +9,19 @@
   --color-card-foreground: #1a1a1a;
   --color-border: #e5e5e5;
   --color-input: #ffffff;
-  --color-primary: #014E83;
+  --color-primary: #00909C;
   --color-primary-foreground: #ffffff;
-  --color-secondary: #0a3d6a;
+  --color-secondary: #EE7810;
   --color-secondary-foreground: #ffffff;
   --color-muted: #f0f0f0;
   --color-muted-foreground: #666666;
-  --color-accent: #e8f2f8;
-  --color-accent-foreground: #014E83;
+  --color-accent: #e0f4f5;
+  --color-accent-foreground: #00909C;
   --color-destructive: #d32f2f;
-  --color-sidebar: #014E83;
+  --color-sidebar: #00909C;
   --color-sidebar-foreground: #ffffff;
-  --color-sidebar-border: #0a3d6a;
-  --color-sidebar-muted: #0a3d6a;
+  --color-sidebar-border: #007a85;
+  --color-sidebar-muted: #007a85;
   --radius: 6px;
 }
 
@@ -32,14 +32,14 @@
   --color-card-foreground: #f5f5f5;
   --color-border: #333333;
   --color-input: #262626;
-  --color-primary: #ED7915;
+  --color-primary: #EE7810;
   --color-primary-foreground: #ffffff;
-  --color-secondary: #d96d0d;
+  --color-secondary: #00909C;
   --color-secondary-foreground: #ffffff;
   --color-muted: #2a2a2a;
   --color-muted-foreground: #999999;
-  --color-accent: #2a2000;
-  --color-accent-foreground: #ED7915;
+  --color-accent: #2a1a00;
+  --color-accent-foreground: #EE7810;
   --color-destructive: #ff5252;
   --color-sidebar: #0f0f0f;
   --color-sidebar-foreground: #f5f5f5;

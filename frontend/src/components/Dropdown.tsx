@@ -54,7 +54,7 @@ export function Dropdown({ items, trigger, align = 'right', className }: Dropdow
       {isOpen && (
         <div
           className={cn(
-            'absolute top-full mt-1 min-w-max bg-card border border-border rounded-md shadow-lg z-50 animate-fade-in',
+            'absolute top-full mt-1 min-w-[140px] bg-card border border-border rounded-md shadow-lg z-[60] animate-fade-in',
             align === 'left' ? 'left-0' : 'right-0'
           )}
         >
