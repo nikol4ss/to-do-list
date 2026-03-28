@@ -1,0 +1,133 @@
+.container {
+  min-height: 100vh;
+  display: flex;
+  background-color: var(--surface);
+}
+
+.main {
+  flex: 1;
+  padding: 1.5rem;
+  padding-top: 4.5rem;
+  overflow-x: hidden;
+}
+
+.content {
+  max-width: 1400px;
+  margin: 0 auto;
+  animation: fadeIn var(--transition-slow) ease-out;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.headerLeft h1 {
+  margin: 0;
+}
+
+.title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.subtitle {
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+  margin: 0.25rem 0 0;
+}
+
+.headerRight {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.searchWrapper {
+  position: relative;
+  flex: 1;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 0.875rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 0.625rem 0.875rem 0.625rem 2.5rem;
+  font-size: 0.9375rem;
+  background-color: var(--background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  transition: all var(--transition);
+}
+
+.searchInput::placeholder {
+  color: var(--text-muted);
+}
+
+.searchInput:hover {
+  border-color: var(--border-focus);
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+.kanban {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (min-width: 768px) {
+  .main {
+    padding: 2rem;
+    padding-left: calc(var(--sidebar-width) + 2rem);
+    padding-top: 2rem;
+  }
+  
+  .header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .headerRight {
+    flex-direction: row;
+    align-items: center;
+  }
+  
+  .searchWrapper {
+    width: 280px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .kanban {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1280px) {
+  .searchWrapper {
+    width: 320px;
+  }
+}
