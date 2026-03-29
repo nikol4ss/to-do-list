@@ -7,8 +7,19 @@ User = get_user_model()
 
 
 class TaskReadSerializer(serializers.ModelSerializer):
-    owner_name = serializers.CharField(source="owner.username", read_only=True)
-    category_name = serializers.CharField(source="category.name", read_only=True)
+    ownerId = serializers.IntegerField(source="owner_id")
+    categoryId = serializers.IntegerField(
+        source="category_id", allow_null=True, required=False
+    )
+    isDone = serializers.BooleanField(source="is_done")
+    dueDate = serializers.DateTimeField(source="due_date", allow_null=True)
+    createdAt = serializers.DateTimeField(source="created_at")
+    updatedAt = serializers.DateTimeField(source="updated_at")
+
+    ownerName = serializers.CharField(source="owner.username", read_only=True)
+    categoryName = serializers.CharField(
+        source="category.name", read_only=True, allow_null=True
+    )
 
     class Meta:
         model = Task
@@ -16,15 +27,15 @@ class TaskReadSerializer(serializers.ModelSerializer):
             "id",
             "title",
             "description",
-            "is_done",
-            "due_date",
-            "owner_name",
-            "category",
-            "category_name",
-            "created_at",
-            "updated_at",
+            "isDone",
+            "dueDate",
+            "ownerId",
+            "ownerName",
+            "categoryId",
+            "categoryName",
+            "createdAt",
+            "updatedAt",
         ]
-        read_only_fields = ["id", "created_at", "updated_at"]
 
 
 class TaskWriteSerializer(serializers.ModelSerializer):

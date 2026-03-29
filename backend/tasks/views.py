@@ -31,7 +31,9 @@ class TaskViewSet(viewsets.ModelViewSet):
         task = self.get_object()
         task.is_done = not task.is_done
         task.save(update_fields=["is_done"])
-        return Response({"is_done": task.is_done})
+
+        serializer = TaskReadSerializer(task)
+        return Response(serializer.data)
 
     @action(detail=True, methods=["get", "post"], url_path="shares")
     def shares(self, request, pk=None):
