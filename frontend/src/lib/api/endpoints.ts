@@ -22,8 +22,11 @@ export const apiEndpoints = {
     update: (id: string) => `/tasks/${id}/`,
     delete: (id: string) => `/tasks/${id}/`,
     toggleStatus: (id: string) => `/tasks/${id}/toggle/`,
+    sharedWithMe: "/tasks/shared-with-me/",
     share: (id: string) => `/tasks/${id}/shares/`,
-    unshare: (id: string) => `/tasks/${id}/shares/`,
+    unshare: (taskId: string, shareId: string) =>
+      `/tasks/${taskId}/shares/${shareId}/`,
+    sharedEdit: (id: string) => `/tasks/${id}/shared-edit/`,
   },
 
   categories: {
