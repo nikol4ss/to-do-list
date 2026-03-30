@@ -41,6 +41,35 @@ Estrutura principal:
 - [.github](/Users/user/Workspaces/projects/to-do-list/.github): automações do GitHub Actions
 - [docker-compose.yml](/Users/user/Workspaces/projects/to-do-list/docker-compose.yml): orquestração local
 
+## Ambientes E Arquivos `.env`
+
+O repositório usa arquivos de ambiente separados por contexto. A ideia é manter cada parte do projeto com suas próprias variáveis, evitando configuração acoplada e facilitando execução local, testes e deploy.
+
+Arquivos de exemplo:
+
+- [backend/.env.example](/Users/user/Workspaces/projects/to-do-list/backend/.env.example): variáveis da API Django, banco e SMTP
+- [frontend/.env.example](/Users/user/Workspaces/projects/to-do-list/frontend/.env.example): variáveis públicas do frontend em tempo de build
+- [e2e/.env.example](/Users/user/Workspaces/projects/to-do-list/e2e/.env.example): variáveis usadas pela suíte Selenium
+
+Arquivos reais esperados:
+
+- `backend/.env`
+- `frontend/.env.local`
+- `e2e/.env`
+
+Resumo de responsabilidade:
+
+- `backend/.env`: define `SECRET_KEY`, `DEBUG`, banco PostgreSQL, SMTP e `FRONTEND_URL`
+- `frontend/.env.local`: define `VITE_API_URL` apontando para a API
+- `e2e/.env`: define URLs do frontend e da API usadas pelos testes automatizados
+
+Observações:
+
+- arquivos reais de ambiente não devem ser versionados
+- o frontend só deve receber variáveis com prefixo `VITE_`
+- as credenciais SMTP devem ficar apenas no backend
+- para Gmail, use senha de app em vez da senha normal da conta
+
 ### Frontend
 
 Local: [frontend](/Users/user/Workspaces/projects/to-do-list/frontend)
@@ -146,6 +175,7 @@ Observações:
 
 - o backend aplica migrations automaticamente na inicialização
 - o frontend em container é servido via Nginx
+- para ambiente com Docker, o banco fica acessível entre containers pelo host `db`
 
 ## Como Rodar Localmente Sem Docker
 
@@ -196,6 +226,14 @@ EMAIL_REPLY_TO=seu_email@gmail.com
 FRONTEND_URL=http://localhost:3000
 ```
 
+Variáveis principais do backend:
+
+- `SECRET_KEY`: chave da aplicação Django
+- `DEBUG`: habilita modo de desenvolvimento
+- `FRONTEND_URL`: usado para montar links enviados por e-mail
+- `DB_*`: conexão com PostgreSQL
+- `EMAIL_*`: configuração SMTP para notificações
+
 Rode as migrations:
 
 ```bash
@@ -231,6 +269,30 @@ Exemplo:
 ```env
 VITE_API_URL=http://localhost:8000/api
 ```
+
+Variável principal do frontend:
+
+- `VITE_API_URL`: URL base da API consumida pelo cliente React
+
+### 3. E2E
+
+Se quiser rodar os testes Selenium localmente, crie `e2e/.env` com base em:
+
+- [e2e/.env.example](/Users/user/Workspaces/projects/to-do-list/e2e/.env.example)
+
+Exemplo:
+
+```env
+E2E_FRONTEND_URL=http://127.0.0.1:3000
+E2E_API_URL=http://127.0.0.1:8000/api
+E2E_WAIT_SECONDS=15
+```
+
+Variáveis principais do E2E:
+
+- `E2E_FRONTEND_URL`: página aberta pelo navegador automatizado
+- `E2E_API_URL`: API auxiliar usada nos testes
+- `E2E_WAIT_SECONDS`: tempo máximo de espera por renderização e redirecionamento
 
 Inicie o frontend:
 
