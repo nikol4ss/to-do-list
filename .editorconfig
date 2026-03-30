@@ -1,0 +1,40 @@
+root = true
+
+# All files
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 2
+
+# Python files
+[*.py]
+indent_size = 4
+
+# Django templates (HTML)
+[*.html]
+indent_size = 2
+
+# JavaScript, TypeScript, React (JSX/TSX)
+[*.{js,jsx,ts,tsx}]
+indent_size = 2
+quote_type = single
+
+# CSS, SCSS, Less
+[*.{css,scss,less}]
+indent_size = 2
+
+# JSON, YAML, TOML
+[*.{json,yml,yaml,toml}]
+indent_size = 2
+
+# Markdown
+[*.md]
+trim_trailing_whitespace = false
+max_line_length = off
+
+# Ignore binary files
+[*.{png,jpg,jpeg,gif,ico,svg,mp4,mp3,woff,woff2,eot,ttf}]
+trim_trailing_whitespace = false
