@@ -1,3 +1,4 @@
+from django.db.models import Q
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -20,12 +21,46 @@ def _task_with_prefetch(pk):
 class TaskViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated, IsOwner]
 
+    def _apply_filters(self, queryset):
+        params = self.request.query_params
+        search = params.get("search", "").strip()
+        category = params.get("category")
+        is_done = params.get("is_done")
+        ordering = params.get("ordering", "-created_at")
+
+        if search:
+            queryset = queryset.filter(
+                Q(title__icontains=search) | Q(description__icontains=search)
+            )
+
+        if category:
+            queryset = queryset.filter(category_id=category)
+
+        if is_done in {"true", "false"}:
+            queryset = queryset.filter(is_done=is_done == "true")
+
+        allowed_ordering = {
+            "created_at",
+            "-created_at",
+            "due_date",
+            "-due_date",
+            "title",
+            "-title",
+            "updated_at",
+            "-updated_at",
+        }
+        if ordering in allowed_ordering:
+            queryset = queryset.order_by(ordering)
+
+        return queryset
+
     def get_queryset(self):
-        return (
+        queryset = (
             Task.objects.filter(owner=self.request.user)
             .prefetch_related("shares__shared_with")
             .select_related("owner", "category")
         )
+        return self._apply_filters(queryset)
 
     def get_serializer_class(self):
         if self.action in ["list", "retrieve"]:
@@ -133,22 +168,24 @@ class TaskViewSet(viewsets.ModelViewSet):
         permission_classes=[permissions.IsAuthenticated],
     )
     def shared_with_me(self, request):
-        task_ids = TaskShare.objects.filter(shared_with=request.user).values_list(
-            "task_id", flat=True
-        )
+        task_ids = TaskShare.objects.filter(
+            shared_with=request.user
+        ).values_list("task_id", flat=True)
 
-        tasks = (
+        tasks = self._apply_filters(
             Task.objects.filter(id__in=task_ids)
             .prefetch_related("shares__shared_with")
             .select_related("owner", "category")
         )
-        return Response(
-            TaskReadSerializer(
-                tasks,
-                many=True,
-                context={"request": request},
-            ).data
+        page = self.paginate_queryset(tasks)
+        serializer = TaskReadSerializer(
+            page if page is not None else tasks,
+            many=True,
+            context={"request": request},
         )
+        if page is not None:
+            return self.get_paginated_response(serializer.data)
+        return Response(serializer.data)
 
     @action(
         detail=True,

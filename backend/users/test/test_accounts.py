@@ -1,5 +1,6 @@
 import pytest
 from django.contrib.auth import get_user_model
+from django.core import mail
 from django.urls import reverse
 
 User = get_user_model()
@@ -199,3 +200,33 @@ class TestProfileView:
         user.refresh_from_db()
         assert user.first_name == "Full"
         assert user.last_name == "Update"
+
+
+@pytest.mark.django_db
+class TestNotificationView:
+    url = reverse("test_notification")
+
+    def test_send_test_notification_success(self, auth_client, user):
+        user.notifications_enabled = True
+        user.save(update_fields=["notifications_enabled"])
+
+        response = auth_client.post(self.url, {}, format="json")
+
+        assert response.status_code == 200
+        assert len(mail.outbox) == 1
+        assert user.email in mail.outbox[0].to
+
+    def test_send_test_notification_requires_enabled_notifications(
+        self, auth_client, user
+    ):
+        user.notifications_enabled = False
+        user.save(update_fields=["notifications_enabled"])
+
+        response = auth_client.post(self.url, {}, format="json")
+
+        assert response.status_code == 400
+        assert len(mail.outbox) == 0
+
+    def test_send_test_notification_unauthenticated(self, api_client):
+        response = api_client.post(self.url, {}, format="json")
+        assert response.status_code == 401

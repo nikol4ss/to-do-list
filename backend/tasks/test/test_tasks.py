@@ -1,7 +1,10 @@
 import pytest
 from categories.models import Category
+from django.core import mail
 from django.urls import reverse
+from rest_framework.pagination import PageNumberPagination
 from tasks.models import Task, TaskShare
+from tasks.views import TaskViewSet
 
 
 def make_task(owner, title="Minha tarefa", **kwargs):
@@ -16,6 +19,10 @@ def make_share(task, shared_with, permission=TaskShare.Permission.READ):
 
 def make_category(owner, name="Cat", color="#AABBCC"):
     return Category.objects.create(owner=owner, name=name, color=color)
+
+
+class TestPagination(PageNumberPagination):
+    page_size = 1
 
 
 # LIST  —  GET /tasks/
@@ -69,6 +76,45 @@ class TestTaskList:
         make_task(user)
         data = auth_client.get(self.url).json()[0]
         assert data["ownerName"] == user.username
+
+    def test_list_filters_by_search(self, auth_client, user):
+        make_task(user, "Comprar leite", description="mercado")
+        make_task(user, "Estudar python", description="backend")
+        response = auth_client.get(self.url, {"search": "leite"})
+        assert response.status_code == 200
+        data = response.json()
+        assert len(data) == 1
+        assert data[0]["title"] == "Comprar leite"
+
+    def test_list_filters_by_category(self, auth_client, user):
+        work = make_category(user, "Work")
+        personal = make_category(user, "Personal")
+        make_task(user, "A", category=work)
+        make_task(user, "B", category=personal)
+        response = auth_client.get(self.url, {"category": work.id})
+        assert response.status_code == 200
+        data = response.json()
+        assert len(data) == 1
+        assert data[0]["categoryId"] == work.id
+
+    def test_list_filters_by_is_done(self, auth_client, user):
+        make_task(user, "Done", is_done=True)
+        make_task(user, "Open", is_done=False)
+        response = auth_client.get(self.url, {"is_done": "true"})
+        assert response.status_code == 200
+        data = response.json()
+        assert len(data) == 1
+        assert data[0]["title"] == "Done"
+
+    def test_list_is_paginated_when_enabled(self, auth_client, user, monkeypatch):
+        monkeypatch.setattr(TaskViewSet, "pagination_class", TestPagination)
+        make_task(user, "T1")
+        make_task(user, "T2")
+        response = auth_client.get(self.url)
+        assert response.status_code == 200
+        data = response.json()
+        assert data["count"] == 2
+        assert len(data["results"]) == 1
 
 
 # CREATE  —  POST /tasks/
@@ -277,6 +323,22 @@ class TestToggleDone:
         data = auth_client.patch(url).json()
         assert "isDone" in data
 
+    def test_toggle_sends_completion_email_to_shared_users(
+        self, auth_client, user, other_user
+    ):
+        task = make_task(user, is_done=False)
+        other_user.notifications_enabled = True
+        other_user.notify_on_task_completed = True
+        other_user.save(
+            update_fields=["notifications_enabled", "notify_on_task_completed"]
+        )
+        make_share(task, other_user)
+        url = reverse("task-toggle-done", args=[task.id])
+        response = auth_client.patch(url)
+        assert response.status_code == 200
+        assert len(mail.outbox) == 1
+        assert other_user.email in mail.outbox[0].to
+
     def test_toggle_other_user_task(self, auth_client, other_user):
         task = make_task(other_user)
         url = reverse("task-toggle-done", args=[task.id])
@@ -337,6 +399,9 @@ class TestSharesList:
 class TestShareCreate:
 
     def test_share_success(self, auth_client, user, other_user):
+        other_user.notifications_enabled = True
+        other_user.notify_on_task_shared = True
+        other_user.save(update_fields=["notifications_enabled", "notify_on_task_shared"])
         task = make_task(user)
         url = reverse("task-shares", args=[task.id])
         payload = {
@@ -346,6 +411,8 @@ class TestShareCreate:
         response = auth_client.post(url, payload, format="json")
         assert response.status_code == 201
         assert TaskShare.objects.filter(task=task, shared_with=other_user).exists()
+        assert len(mail.outbox) == 1
+        assert other_user.email in mail.outbox[0].to
 
     def test_share_edit_permission(self, auth_client, user, other_user):
         task = make_task(user)
@@ -483,6 +550,28 @@ class TestSharedWithMe:
         response = auth_client.get(self.url)
         assert len(response.json()) == 2
 
+    def test_shared_with_me_filters_by_search(self, auth_client, user, other_user):
+        make_share(make_task(other_user, "Planejar viagem"), user)
+        make_share(make_task(other_user, "Organizar docs"), user)
+        response = auth_client.get(self.url, {"search": "viagem"})
+        assert response.status_code == 200
+        data = response.json()
+        assert len(data) == 1
+        assert data[0]["title"] == "Planejar viagem"
+
+    def test_shared_with_me_is_paginated_when_enabled(
+        self, auth_client, user, other_user, create_user, monkeypatch
+    ):
+        monkeypatch.setattr(TaskViewSet, "pagination_class", TestPagination)
+        third = create_user()
+        make_share(make_task(other_user, "T1"), user)
+        make_share(make_task(third, "T2"), user)
+        response = auth_client.get(self.url)
+        assert response.status_code == 200
+        data = response.json()
+        assert data["count"] == 2
+        assert len(data["results"]) == 1
+
 
 # SHARED EDIT  —  PATCH /tasks/{id}/shared-edit/
 @pytest.mark.django_db
@@ -543,6 +632,22 @@ class TestSharedEdit:
         data = auth_client.patch(url, {"title": "Updated"}, format="json").json()
         for f in ("id", "title", "isDone", "ownerId", "ownerName"):
             assert f in data, f"Campo ausente: {f}"
+
+    def test_shared_edit_sends_completion_email_to_owner(
+        self, auth_client, user, other_user
+    ):
+        other_user.notifications_enabled = True
+        other_user.notify_on_task_completed = True
+        other_user.save(
+            update_fields=["notifications_enabled", "notify_on_task_completed"]
+        )
+        task = make_task(other_user, "Shared completion", is_done=False)
+        make_share(task, user, permission=TaskShare.Permission.EDIT)
+        url = reverse("task-shared-edit", args=[task.id])
+        response = auth_client.patch(url, {"is_done": True}, format="json")
+        assert response.status_code == 200
+        assert len(mail.outbox) == 1
+        assert other_user.email in mail.outbox[0].to
 
     def test_shared_edit_own_task_forbidden(self, auth_client, user):
         task = make_task(user, "Own Task")
