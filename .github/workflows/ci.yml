@@ -193,7 +193,7 @@ jobs:
           done
 
       - name: Run Selenium tests
-        run: python -m pytest e2e/selenium -v
+        run: python -m pytest -p no:django e2e/selenium -v
 
       - name: Upload app logs
         if: always()
