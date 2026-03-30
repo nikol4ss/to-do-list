@@ -156,6 +156,8 @@ export default function LoginPage() {
                 Username
               </label>
               <input
+                id="login-username"
+                name="username"
                 type="text"
                 value={username}
                 onChange={(e) => handleFieldChange("username", e.target.value)}
@@ -181,6 +183,8 @@ export default function LoginPage() {
               </label>
               <div className="relative">
                 <input
+                  id="login-password"
+                  name="password"
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) =>
@@ -210,6 +214,7 @@ export default function LoginPage() {
             </div>
 
             <button
+              id="login-submit"
               type="submit"
               disabled={isLoading}
               className="flex items-center justify-center gap-2 w-full h-11 rounded-md bg-primary text-primary-foreground font-semibold text-sm hover:bg-primary/90 active:scale-[0.98] transition-all disabled:opacity-70 disabled:cursor-not-allowed shadow-lg shadow-primary/20"

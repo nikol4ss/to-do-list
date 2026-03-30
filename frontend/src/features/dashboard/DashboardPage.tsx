@@ -64,7 +64,10 @@ export default function DashboardPage() {
     <div className="flex flex-col gap-6 font-sans animate-fade-in">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-foreground text-balance">
+          <h1
+            id="dashboard-greeting"
+            className="text-2xl font-bold text-foreground text-balance"
+          >
             Olá, {displayName}!
           </h1>
           <p className="text-muted-foreground text-sm mt-0.5">

@@ -173,6 +173,8 @@ export default function SignupPage() {
               <div className="space-y-2">
                 <label className="text-sm font-medium flex gap-1">Nome</label>
                 <input
+                  id="signup-first-name"
+                  name="first_name"
                   value={firstName}
                   onChange={(e) =>
                     handleFieldChange("first_name", e.target.value)
@@ -195,6 +197,8 @@ export default function SignupPage() {
                   Sobrenome
                 </label>
                 <input
+                  id="signup-last-name"
+                  name="last_name"
                   value={lastName}
                   onChange={(e) =>
                     handleFieldChange("last_name", e.target.value)
@@ -218,6 +222,8 @@ export default function SignupPage() {
                 Nome de usuário <span className="text-destructive">*</span>
               </label>
               <input
+                id="signup-username"
+                name="username"
                 value={username}
                 onChange={(e) => handleFieldChange("username", e.target.value)}
                 disabled={isLoading}
@@ -239,6 +245,8 @@ export default function SignupPage() {
                 E-mail <span className="text-destructive">*</span>
               </label>
               <input
+                id="signup-email"
+                name="email"
                 type="email"
                 value={email}
                 onChange={(e) => handleFieldChange("email", e.target.value)}
@@ -263,6 +271,8 @@ export default function SignupPage() {
               </label>
               <div className="relative">
                 <input
+                  id="signup-password"
+                  name="password"
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) =>
@@ -290,6 +300,7 @@ export default function SignupPage() {
             </div>
 
             <button
+              id="signup-submit"
               type="submit"
               disabled={isLoading}
               className="flex items-center justify-center gap-2 w-full h-11 mt-4 rounded-md bg-primary text-primary-foreground font-semibold text-sm hover:bg-primary/90 active:scale-[0.98] transition-all disabled:opacity-70 disabled:cursor-not-allowed"

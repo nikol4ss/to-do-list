@@ -106,6 +106,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         password,
       });
 
+      await authService.login({
+        username,
+        password,
+      });
+
+      const userData = await authService.getMe();
+      setUser(userData);
       addToast("Conta criada com sucesso!", "success");
     },
     [addToast],
