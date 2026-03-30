@@ -58,6 +58,7 @@ export function TaskCard({ task, category, onEdit, onView }: TaskCardProps) {
       setSharePermission("edit");
       setShowSharePrompt(false);
     } catch {
+      return;
     } finally {
       setIsSharing(false);
     }
@@ -160,7 +161,9 @@ export function TaskCard({ task, category, onEdit, onView }: TaskCardProps) {
                 <span
                   className={cn(
                     "text-xs px-2 py-0.5 rounded-sm font-medium",
-                    resolvedCategoryColor ? "text-white" : "bg-muted text-muted-foreground",
+                    resolvedCategoryColor
+                      ? "text-white"
+                      : "bg-muted text-muted-foreground",
                   )}
                   style={
                     resolvedCategoryColor
@@ -196,8 +199,8 @@ export function TaskCard({ task, category, onEdit, onView }: TaskCardProps) {
                   {isOwner
                     ? "Compartilhada"
                     : task.sharePermission === "edit"
-                      ? "Recebida com edicao"
-                      : "Recebida com visualizacao"}
+                      ? "Recebida com edição"
+                      : "Recebida com visualização"}
                 </span>
               )}
             </div>

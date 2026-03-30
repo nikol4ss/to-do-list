@@ -21,6 +21,10 @@ class TaskReadSerializer(serializers.ModelSerializer):
         source="category.name", read_only=True, allow_null=True
     )
 
+    shared = serializers.SerializerMethodField()
+    sharedWith = serializers.SerializerMethodField()
+    sharePermission = serializers.SerializerMethodField()
+
     class Meta:
         model = Task
         fields = [
@@ -33,16 +37,36 @@ class TaskReadSerializer(serializers.ModelSerializer):
             "ownerName",
             "categoryId",
             "categoryName",
+            "shared",
+            "sharedWith",
+            "sharePermission",
             "createdAt",
             "updatedAt",
         ]
+
+    def get_shared(self, obj) -> bool:
+        return obj.shares.all().exists()
+
+    def get_sharedWith(self, obj) -> list[str]:
+        return [share.shared_with.username for share in obj.shares.all()]
+
+    def get_sharePermission(self, obj):
+        request = self.context.get("request")
+        if not request or not getattr(request, "user", None):
+            return None
+
+        if obj.owner_id == request.user.id:
+            return "owner"
+
+        share = obj.shares.filter(shared_with=request.user).first()
+        return share.permission if share else None
 
 
 class TaskWriteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Task
-        fields = ["title", "description", "due_date", "category"]
+        fields = ["title", "description", "due_date", "category", "is_done"]
 
     def validate_title(self, value):
         value = value.strip()
