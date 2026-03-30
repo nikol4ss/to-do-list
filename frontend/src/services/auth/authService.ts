@@ -58,12 +58,16 @@ export const authService = {
   },
 
   async updateProfile(profileData: Partial<User>): Promise<User> {
-    const updatedUser = await httpClient.put<User>(
+    const updatedUser = await httpClient.patch<User>(
       apiEndpoints.auth.me,
       profileData,
     );
     localStorage.setItem("auth_user", JSON.stringify(updatedUser));
     return updatedUser;
+  },
+
+  async sendTestNotification(): Promise<void> {
+    await httpClient.post(apiEndpoints.auth.testNotification, {});
   },
 
   async refreshToken(): Promise<AuthResponse> {

@@ -26,6 +26,7 @@ interface AuthContextType {
   ) => Promise<void>;
   logout: () => void;
   updateProfile: (data: Partial<User>) => Promise<void>;
+  sendTestNotification: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -78,17 +79,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = useCallback(
     async (username: string, password: string) => {
-      try {
-        await authService.login({
-          username,
-          password,
-        });
-        const userData = await authService.getMe();
-        setUser(userData);
-        addToast("Bem-vindo de volta!", "success");
-      } catch (error) {
-        throw error;
-      }
+      await authService.login({
+        username,
+        password,
+      });
+      const userData = await authService.getMe();
+      setUser(userData);
+      addToast("Bem-vindo de volta!", "success");
     },
     [addToast],
   );
@@ -101,19 +98,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       email: string,
       password: string,
     ) => {
-      try {
-        await authService.signup({
-          first_name,
-          last_name,
-          username,
-          email,
-          password,
-        });
+      await authService.signup({
+        first_name,
+        last_name,
+        username,
+        email,
+        password,
+      });
 
-        addToast("Conta criada com sucesso!", "success");
-      } catch (error) {
-        throw error;
-      }
+      addToast("Conta criada com sucesso!", "success");
     },
     [addToast],
   );
@@ -140,6 +133,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [addToast],
   );
 
+  const sendTestNotification = useCallback(async () => {
+    try {
+      await authService.sendTestNotification();
+      addToast("E-mail de teste enviado!", "success");
+    } catch (error) {
+      const { message } = handleApiError(error);
+      addToast(message, "error");
+      throw error;
+    }
+  }, [addToast]);
+
   const value: AuthContextType = {
     user,
     isLoading,
@@ -148,6 +152,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     signup,
     logout,
     updateProfile,
+    sendTestNotification,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

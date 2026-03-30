@@ -33,5 +33,15 @@ class RegisterSerializer(serializers.ModelSerializer):
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["id", "username", "first_name", "last_name", "email", "date_joined"]
+        fields = [
+            "id",
+            "username",
+            "first_name",
+            "last_name",
+            "email",
+            "date_joined",
+            "notifications_enabled",
+            "notify_on_task_shared",
+            "notify_on_task_completed",
+        ]
         read_only_fields = ["id", "date_joined"]

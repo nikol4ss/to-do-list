@@ -3,6 +3,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from .models import Task, TaskShare
+from .notifications import send_task_completed_email, send_task_shared_email
 from .permissions import IsOwner
 from .serializers import (
     TaskReadSerializer,
@@ -12,11 +13,19 @@ from .serializers import (
 )
 
 
+def _task_with_prefetch(pk):
+    return Task.objects.prefetch_related("shares__shared_with").get(pk=pk)
+
+
 class TaskViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated, IsOwner]
 
     def get_queryset(self):
-        return Task.objects.filter(owner=self.request.user)
+        return (
+            Task.objects.filter(owner=self.request.user)
+            .prefetch_related("shares__shared_with")
+            .select_related("owner", "category")
+        )
 
     def get_serializer_class(self):
         if self.action in ["list", "retrieve"]:
@@ -29,18 +38,28 @@ class TaskViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=["patch"], url_path="toggle")
     def toggle_done(self, request, pk=None):
         task = self.get_object()
+        was_done = task.is_done
         task.is_done = not task.is_done
-        task.save(update_fields=["is_done"])
+        task.save(update_fields=["is_done", "updated_at"])
 
-        serializer = TaskReadSerializer(task)
-        return Response(serializer.data)
+        if not was_done and task.is_done:
+            shares = TaskShare.objects.filter(task=task).select_related("shared_with")
+            for share in shares:
+                send_task_completed_email(
+                    task=task,
+                    actor=request.user,
+                    recipient=share.shared_with,
+                )
+
+        refreshed = _task_with_prefetch(task.pk)
+        return Response(TaskReadSerializer(refreshed, context={"request": request}).data)
 
     @action(detail=True, methods=["get", "post"], url_path="shares")
     def shares(self, request, pk=None):
         task = self.get_object()
 
         if request.method == "GET":
-            shares = TaskShare.objects.filter(task=task)
+            shares = TaskShare.objects.filter(task=task).select_related("shared_with")
             serializer = TaskShareReadSerializer(shares, many=True)
             return Response(serializer.data)
 
@@ -50,10 +69,44 @@ class TaskViewSet(viewsets.ModelViewSet):
         )
         serializer.is_valid(raise_exception=True)
         share = serializer.save()
+        send_task_shared_email(
+            task=task,
+            sender=request.user,
+            recipient=share.shared_with,
+            permission=share.permission,
+        )
+
+        refreshed = _task_with_prefetch(task.pk)
         return Response(
-            TaskShareReadSerializer(share).data,
+            TaskReadSerializer(refreshed, context={"request": request}).data,
             status=status.HTTP_201_CREATED,
         )
+
+    @action(detail=True, methods=["delete"], url_path="unshare")
+    def unshare(self, request, pk=None):
+        task = self.get_object()
+        username = request.query_params.get("username", "").strip()
+
+        if not username:
+            return Response(
+                {"detail": "Parâmetro 'username' obrigatório."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        share = TaskShare.objects.filter(
+            task=task, shared_with__username=username
+        ).first()
+
+        if not share:
+            return Response(
+                {"detail": "Compartilhamento não encontrado."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        share.delete()
+
+        refreshed = _task_with_prefetch(task.pk)
+        return Response(TaskReadSerializer(refreshed, context={"request": request}).data)
 
     @action(
         detail=True,
@@ -84,9 +137,18 @@ class TaskViewSet(viewsets.ModelViewSet):
             "task_id", flat=True
         )
 
-        tasks = Task.objects.filter(id__in=task_ids)
-        serializer = TaskReadSerializer(tasks, many=True)
-        return Response(serializer.data)
+        tasks = (
+            Task.objects.filter(id__in=task_ids)
+            .prefetch_related("shares__shared_with")
+            .select_related("owner", "category")
+        )
+        return Response(
+            TaskReadSerializer(
+                tasks,
+                many=True,
+                context={"request": request},
+            ).data
+        )
 
     @action(
         detail=True,
@@ -117,6 +179,7 @@ class TaskViewSet(viewsets.ModelViewSet):
 
         allowed_fields = {"title", "description", "due_date", "is_done"}
         data = {k: v for k, v in request.data.items() if k in allowed_fields}
+        was_done = task.is_done
 
         serializer = TaskWriteSerializer(
             task,
@@ -126,4 +189,13 @@ class TaskViewSet(viewsets.ModelViewSet):
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response(TaskReadSerializer(task).data)
+
+        if not was_done and task.is_done and task.owner_id != request.user.id:
+            send_task_completed_email(
+                task=task,
+                actor=request.user,
+                recipient=task.owner,
+            )
+
+        refreshed = _task_with_prefetch(task.pk)
+        return Response(TaskReadSerializer(refreshed, context={"request": request}).data)

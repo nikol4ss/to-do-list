@@ -8,6 +8,7 @@ export const apiEndpoints = {
     register: "/auth/signup/",
     refresh: "/auth/refresh/",
     me: "/auth/profile/",
+    testNotification: "/auth/profile/test-notification/",
   },
 
   users: {

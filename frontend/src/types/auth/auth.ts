@@ -5,6 +5,9 @@ export interface User {
   last_name: string;
   email: string;
   date_joined?: string;
+  notifications_enabled: boolean;
+  notify_on_task_shared: boolean;
+  notify_on_task_completed: boolean;
 }
 
 export interface AuthCredentials {
