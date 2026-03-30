@@ -63,7 +63,7 @@ body {
 #root {
   width: 100%;
   min-height: 100svh;
-} /* Smooth transitions for theme switching */
+}
 *,
 *::before,
 *::after {
@@ -71,7 +71,7 @@ body {
     background-color 0.2s ease,
     border-color 0.2s ease,
     color 0.15s ease;
-} /* Scrollbar */
+}
 ::-webkit-scrollbar {
   width: 5px;
   height: 5px;

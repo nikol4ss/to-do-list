@@ -263,7 +263,6 @@ export default function ProfilePage() {
           Categorias
         </h2>
 
-        {/* Add new category */}
         <div className="flex items-end gap-3 mb-4 p-4 bg-muted/50 rounded-md border border-border">
           <div className="flex-1">
             <label
@@ -309,7 +308,6 @@ export default function ProfilePage() {
           </button>
         </div>
 
-        {/* Preset colors */}
         <div className="flex flex-wrap gap-2 mb-5">
           {PRESET_COLORS.map((color) => (
             <button
@@ -327,7 +325,6 @@ export default function ProfilePage() {
           ))}
         </div>
 
-        {/* Category list */}
         {categories.length === 0 ? (
           <p className="text-sm text-muted-foreground text-center py-6">
             Nenhuma categoria criada ainda.
