@@ -1,5 +1,6 @@
 import { useTasks } from "@/hooks";
-import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks/use-auth";
+import { cn, fromTaskDueDateValue, toTaskDueDateValue } from "@/lib/utils";
 import type { Task, TaskFormData } from "@/types";
 import { Plus, X } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -19,11 +20,16 @@ const defaultForm: TaskFormData = {
 
 export function TaskModal({ isOpen, onClose, editTask }: TaskModalProps) {
   const { createTask, updateTask, categories } = useTasks();
+  const { user } = useAuth();
   const [form, setForm] = useState<TaskFormData>(defaultForm);
   const [errors, setErrors] = useState<
     Partial<Record<keyof TaskFormData, string>>
   >({});
   const [isLoading, setIsLoading] = useState(false);
+  const isOwner = editTask
+    ? String(editTask.ownerId) === String(user?.id ?? "")
+    : true;
+  const sharedCategoryLabel = editTask?.categoryName ?? "Sem categoria";
 
   useEffect(() => {
     if (editTask) {
@@ -31,7 +37,7 @@ export function TaskModal({ isOpen, onClose, editTask }: TaskModalProps) {
         title: editTask.title,
         description: editTask.description ?? "",
         categoryId: editTask.categoryId ?? "",
-        dueDate: editTask.dueDate ? editTask.dueDate.slice(0, 10) : "",
+        dueDate: toTaskDueDateValue(editTask.dueDate) ?? "",
       });
     } else {
       setForm({ ...defaultForm });
@@ -54,7 +60,7 @@ export function TaskModal({ isOpen, onClose, editTask }: TaskModalProps) {
     const payload: TaskFormData = {
       ...form,
       categoryId: form.categoryId || undefined,
-      dueDate: form.dueDate ? new Date(form.dueDate).toISOString() : undefined,
+      dueDate: fromTaskDueDateValue(form.dueDate),
     };
 
     try {
@@ -159,21 +165,27 @@ export function TaskModal({ isOpen, onClose, editTask }: TaskModalProps) {
               >
                 Categoria
               </label>
-              <select
-                id="task-category"
-                value={form.categoryId}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, categoryId: e.target.value }))
-                }
-                className="w-full px-3 py-2.5 rounded-md border border-border text-sm bg-input text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary"
-              >
-                <option value="">Sem categoria</option>
-                {categories.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
+              {editTask && !isOwner ? (
+                <div className="w-full px-3 py-2.5 rounded-md border border-border text-sm bg-muted text-muted-foreground">
+                  {sharedCategoryLabel}
+                </div>
+              ) : (
+                <select
+                  id="task-category"
+                  value={form.categoryId}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, categoryId: e.target.value }))
+                  }
+                  className="w-full px-3 py-2.5 rounded-md border border-border text-sm bg-input text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary"
+                >
+                  <option value="">Sem categoria</option>
+                  {categories.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+              )}
             </div>
 
             <div>

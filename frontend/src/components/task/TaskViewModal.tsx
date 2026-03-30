@@ -1,12 +1,13 @@
+import { useTasks } from "@/hooks";
+import { useAuth } from "@/hooks/use-auth";
 import { formatDateShort } from "@/lib/utils";
-import type { Category, Task } from "@/types";
-import { Calendar, Clock, FolderOpen, X } from "lucide-react";
+import type { Task } from "@/types";
+import { Calendar, Clock, FolderOpen, Users, X } from "lucide-react";
 
 interface TaskViewModalProps {
   isOpen: boolean;
   onClose: () => void;
   task: Task | null;
-  category?: Category;
   onEdit: () => void;
 }
 
@@ -14,9 +15,18 @@ export function TaskViewModal({
   isOpen,
   onClose,
   task,
-  category,
   onEdit,
 }: TaskViewModalProps) {
+  const { user } = useAuth();
+  const { categories } = useTasks();
+  const category = task?.categoryId
+    ? categories.find((c) => c.id === task.categoryId)
+    : undefined;
+  const isOwner = task ? String(task.ownerId) === String(user?.id ?? "") : false;
+  const canEdit = isOwner || task?.sharePermission === "edit";
+  const categoryLabel = category?.name || task?.categoryName || null;
+  const categoryColor = category?.color;
+
   if (!isOpen || !task) return null;
 
   return (
@@ -49,7 +59,7 @@ export function TaskViewModal({
                   {task.title}
                 </h3>
                 {task.description && (
-                  <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
+                  <p className="text-sm text-muted-foreground mt-2 leading-relaxed whitespace-pre-wrap">
                     {task.description}
                   </p>
                 )}
@@ -61,12 +71,20 @@ export function TaskViewModal({
                     <FolderOpen size={12} />
                     Categoria
                   </span>
-                  {category ? (
+                  {categoryLabel ? (
                     <span
-                      className="inline-flex items-center w-fit text-xs px-2 py-1 rounded font-medium text-white"
-                      style={{ backgroundColor: category.color }}
+                      className={
+                        categoryColor
+                          ? "inline-flex items-center w-fit text-xs px-2 py-1 rounded font-medium text-white"
+                          : "inline-flex items-center w-fit text-xs px-2 py-1 rounded font-medium bg-muted text-muted-foreground"
+                      }
+                      style={
+                        categoryColor
+                          ? { backgroundColor: categoryColor }
+                          : undefined
+                      }
                     >
-                      {category.name}
+                      {categoryLabel}
                     </span>
                   ) : (
                     <span className="text-sm text-muted-foreground">
@@ -94,9 +112,23 @@ export function TaskViewModal({
                     {formatDateShort(task.createdAt)}
                   </span>
                 </div>
+
+                <div className="flex flex-col gap-1">
+                  <span className="text-xs font-medium text-muted-foreground">
+                    Status
+                  </span>
+                  <span
+                    className={
+                      task.isDone
+                        ? "text-sm font-medium text-emerald-600 dark:text-emerald-400"
+                        : "text-sm text-muted-foreground"
+                    }
+                  >
+                    {task.isDone ? "Concluída ✓" : "Em aberto"}
+                  </span>
+                </div>
               </div>
 
-              {/* Exibe "Concluída em" somente se a tarefa estiver de fato concluída */}
               {task.isDone && (
                 <div className="flex flex-col gap-1 pt-2 border-t border-border">
                   <span className="text-xs font-medium text-muted-foreground">
@@ -105,6 +137,25 @@ export function TaskViewModal({
                   <span className="text-sm text-emerald-600 dark:text-emerald-400 font-medium">
                     {formatDateShort(task.updatedAt)}
                   </span>
+                </div>
+              )}
+
+              {Array.isArray(task.sharedWith) && task.sharedWith.length > 0 && (
+                <div className="flex flex-col gap-2 pt-2 border-t border-border">
+                  <span className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
+                    <Users size={12} />
+                    Compartilhada com
+                  </span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {task.sharedWith.map((username) => (
+                      <span
+                        key={username}
+                        className="text-xs px-2 py-0.5 rounded-full bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300 font-medium"
+                      >
+                        @{username}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
@@ -119,9 +170,10 @@ export function TaskViewModal({
             </button>
             <button
               onClick={onEdit}
+              disabled={!canEdit}
               className="px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
             >
-              Editar
+              {canEdit ? "Editar" : "Somente visualizar"}
             </button>
           </div>
         </div>

@@ -165,6 +165,24 @@ export function parseAxiosError(error: AxiosError): ApiError {
   if (data && typeof data === "object") {
     const dataObj = data as any;
 
+    const extractFirstMessage = (value: unknown): string | undefined => {
+      if (typeof value === "string" && value.trim()) return value;
+      if (Array.isArray(value)) {
+        for (const item of value) {
+          const extracted = extractFirstMessage(item);
+          if (extracted) return extracted;
+        }
+        return undefined;
+      }
+      if (value && typeof value === "object") {
+        for (const nested of Object.values(value)) {
+          const extracted = extractFirstMessage(nested);
+          if (extracted) return extracted;
+        }
+      }
+      return undefined;
+    };
+
     message =
       dataObj.detail ||
       dataObj.message ||
@@ -174,19 +192,10 @@ export function parseAxiosError(error: AxiosError): ApiError {
         : dataObj.non_field_errors) ||
       message;
 
-    if (status === 401 || status === 400) {
-      if (dataObj.username) {
-        message = Array.isArray(dataObj.username)
-          ? dataObj.username[0]
-          : dataObj.username;
-      } else if (dataObj.email) {
-        message = Array.isArray(dataObj.email)
-          ? dataObj.email[0]
-          : dataObj.email;
-      } else if (dataObj.password) {
-        message = Array.isArray(dataObj.password)
-          ? dataObj.password[0]
-          : dataObj.password;
+    if (status === 401 || status === 400 || status === 403 || status === 404) {
+      const fieldMessage = extractFirstMessage(dataObj);
+      if (fieldMessage) {
+        message = fieldMessage;
       }
     }
 

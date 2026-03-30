@@ -1,4 +1,3 @@
-/// <reference types="vite/client" />
 import { ApiError } from "@/lib/http/errors";
 
 export function handleApiError(error: unknown): {
@@ -69,11 +68,14 @@ export function getValidationErrorMessage(
     "non_field_errors",
     "detail",
     "error",
+    "shared_with_username",
     "username",
     "email",
     "password",
     "first_name",
     "last_name",
+    "title",
+    "description",
   ];
 
   for (const field of priorityFields) {
