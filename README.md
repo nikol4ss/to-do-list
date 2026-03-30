@@ -1,163 +1,125 @@
 # To-Do List Advice
 
-Aplicação web de gerenciamento de tarefas com autenticação, categorias, compartilhamento entre usuários, notificações por e-mail e testes automatizados.
+Aplicação web de gerenciamento de tarefas com autenticação, categorias, compartilhamento entre usuários, notificações por e-mail, testes automatizados e CI.
+
+## Sumário
+
+- [Visão Geral](#visão-geral)
+- [Funcionalidades](#funcionalidades)
+- [Stack](#stack)
+- [Estrutura Do Projeto](#estrutura-do-projeto)
+- [Pré-Requisitos](#pré-requisitos)
+- [Instalação Com Docker](#instalação-com-docker)
+- [Instalação Local Sem Docker](#instalação-local-sem-docker)
+- [Arquivos De Ambiente](#arquivos-de-ambiente)
+- [Como Rodar Os Testes](#como-rodar-os-testes)
+- [Arquitetura E Decisões De Design](#arquitetura-e-decisões-de-design)
+- [Rotas Da API](#rotas-da-api)
+- [CI E Automação](#ci-e-automação)
 
 ## Visão Geral
 
-O projeto foi construído com:
+Este projeto foi construído como uma aplicação full stack para organizar tarefas pessoais e colaborativas. O objetivo não foi apenas criar um CRUD simples, mas entregar um fluxo completo com autenticação, categorias, compartilhamento com permissões, notificações por e-mail, testes e automação de CI.
 
-- `frontend`: React + TypeScript + Vite
-- `backend`: Django + Django REST Framework + JWT
-- `banco de dados`: PostgreSQL
-- `orquestração`: Docker Compose
-- `testes`: pytest no backend e Selenium para fluxos E2E do frontend
-- `CI`: GitHub Actions
-
-Principais funcionalidades:
+## Funcionalidades
 
 - cadastro e login de usuários
-- criação, edição, remoção e conclusão de tarefas
-- criação e gerenciamento de categorias
-- compartilhamento de tarefas com permissão de visualização ou edição
-- envio de notificações por e-mail via SMTP
-- filtros e paginação de tarefas
-- quadro Kanban para organização visual
+- edição de perfil
+- criação, edição, exclusão e conclusão de tarefas
+- categorização de tarefas
+- compartilhamento com permissão de leitura ou edição
+- listagem de tarefas compartilhadas comigo
+- filtros e paginação de tarefas na API
+- organização visual em quadro Kanban
+- notificações por e-mail via SMTP
+- testes automatizados no backend e E2E no frontend
 
-## Arquitetura
+## Stack
 
-O projeto está organizado como um monorepo, com frontend, backend, automação E2E e infraestrutura versionados no mesmo repositório.
+| Camada | Tecnologia |
+| --- | --- |
+| Frontend | React, TypeScript, Vite, Tailwind CSS |
+| Backend | Django, Django REST Framework, JWT |
+| Banco de dados | PostgreSQL |
+| E-mail | SMTP |
+| Testes backend | pytest, pytest-django |
+| Testes E2E | Selenium |
+| Infraestrutura local | Docker Compose |
+| CI | GitHub Actions |
 
-Essa abordagem foi escolhida para:
+## Estrutura Do Projeto
 
-- centralizar a evolução do produto em um único lugar
-- facilitar integração entre interface, API e testes
-- simplificar o CI e o fluxo de execução local
+O repositório segue uma estrutura de `monorepo`, centralizando frontend, backend, testes E2E e automações no mesmo lugar.
 
-Estrutura principal:
+```text
+to-do-list/
+├── backend/     # API Django REST, regras de negócio e integração SMTP
+├── frontend/    # Aplicação React
+├── e2e/         # Testes end-to-end com Selenium
+├── .github/     # Workflows do GitHub Actions
+└── docker-compose.yml
+```
 
-- [frontend](/Users/user/Workspaces/projects/to-do-list/frontend): aplicação React
-- [backend](/Users/user/Workspaces/projects/to-do-list/backend): API Django REST
-- [e2e](/Users/user/Workspaces/projects/to-do-list/e2e): testes end-to-end com Selenium
-- [.github](/Users/user/Workspaces/projects/to-do-list/.github): automações do GitHub Actions
-- [docker-compose.yml](/Users/user/Workspaces/projects/to-do-list/docker-compose.yml): orquestração local
+Pastas principais:
 
-## Ambientes E Arquivos `.env`
+- [backend](/Users/user/Workspaces/projects/to-do-list/backend): autenticação, tarefas, categorias, compartilhamento, notificações e testes
+- [frontend](/Users/user/Workspaces/projects/to-do-list/frontend): interface, componentes, hooks, services e tipos
+- [e2e](/Users/user/Workspaces/projects/to-do-list/e2e): cenários automatizados pela interface web
+- [.github/workflows](/Users/user/Workspaces/projects/to-do-list/.github/workflows): CI e release
 
-O repositório usa arquivos de ambiente separados por contexto. A ideia é manter cada parte do projeto com suas próprias variáveis, evitando configuração acoplada e facilitando execução local, testes e deploy.
+## Pré-Requisitos
 
-Arquivos de exemplo:
+### Para rodar com Docker
 
-- [backend/.env.example](/Users/user/Workspaces/projects/to-do-list/backend/.env.example): variáveis da API Django, banco e SMTP
-- [frontend/.env.example](/Users/user/Workspaces/projects/to-do-list/frontend/.env.example): variáveis públicas do frontend em tempo de build
-- [e2e/.env.example](/Users/user/Workspaces/projects/to-do-list/e2e/.env.example): variáveis usadas pela suíte Selenium
+- Docker
+- Docker Compose
 
-Arquivos reais esperados:
+### Para rodar sem Docker
 
-- `backend/.env`
-- `frontend/.env.local`
-- `e2e/.env`
-
-Resumo de responsabilidade:
-
-- `backend/.env`: define `SECRET_KEY`, `DEBUG`, banco PostgreSQL, SMTP e `FRONTEND_URL`
-- `frontend/.env.local`: define `VITE_API_URL` apontando para a API
-- `e2e/.env`: define URLs do frontend e da API usadas pelos testes automatizados
-
-Observações:
-
-- arquivos reais de ambiente não devem ser versionados
-- o frontend só deve receber variáveis com prefixo `VITE_`
-- as credenciais SMTP devem ficar apenas no backend
-- para Gmail, use senha de app em vez da senha normal da conta
-
-### Frontend
-
-Local: [frontend](/Users/user/Workspaces/projects/to-do-list/frontend)
-
-Responsabilidades principais:
-
-- interface do usuário
-- gerenciamento de estado de autenticação e tarefas
-- consumo da API REST
-- tratamento de erros e feedback visual
-
-Estrutura relevante:
-
-- `src/features`: páginas e fluxos principais
-- `src/components`: componentes reutilizáveis e UI
-- `src/hooks`: regras compartilhadas do frontend
-- `src/services`: camada de comunicação com a API
-- `src/types`: contratos tipados
-
-### Backend
-
-Local: [backend](/Users/user/Workspaces/projects/to-do-list/backend)
-
-Responsabilidades principais:
-
-- autenticação com JWT
-- regras de negócio
-- persistência de dados
-- permissões de acesso
-- notificações por e-mail
-
-Apps principais:
-
-- `users`: cadastro, login, perfil e preferências de notificação
-- `tasks`: tarefas, compartilhamento, conclusão e notificações
-- `categories`: categorias do usuário
-
-### Infraestrutura
-
-Arquivos principais:
-
-- [docker-compose.yml](/Users/user/Workspaces/projects/to-do-list/docker-compose.yml)
-- [.github/workflows/ci.yml](/Users/user/Workspaces/projects/to-do-list/.github/workflows/ci.yml)
-
-Responsabilidades:
-
-- subir frontend, backend e banco via Docker Compose
-- executar pipeline de testes no GitHub Actions
-- padronizar a execução local e em CI
-
-## Decisões De Design
-
-O projeto foi mantido com foco em clareza e manutenção.
-
-Principais decisões:
-
-- `DRF + JWT`: simplifica autenticação stateless e integração com frontend SPA
-- `React + services + hooks`: separa UI da lógica de consumo de API
-- `TaskShare` com permissão `read/edit`: evita duplicação de tarefas compartilhadas
-- `SMTP no backend`: protege credenciais e centraliza o envio de e-mails
-- `settings_test.py`: desacopla os testes do ambiente Docker local
-- `pytest + Selenium`: cobre regras de negócio no backend e fluxos reais de interface no frontend
-
-Princípios aplicados:
-
-- `KISS`: fluxo direto para autenticação, tarefas e categorias
-- `DRY`: reaproveitamento de serviços, serializers e helpers
-- `SOLID`: separação razoável entre camadas de UI, serviço, view e serializer
-
-Observação:
-
-- a maior concentração de regra no frontend está no provider de tarefas, o que ainda pode ser modularizado no futuro
-
-## Requisitos
-
-Para rodar localmente sem Docker:
-
-- `Python 3.12+`
-- `Node.js 22+`
+- Python `3.12+`
+- Node.js `22+`
 - `pnpm`
-- `PostgreSQL`
+- PostgreSQL
 
-Para rodar com Docker:
+## Instalação Com Docker
 
-- `Docker`
-- `Docker Compose`
+Esta é a forma mais simples de subir o projeto.
 
-## Como Rodar Com Docker Compose
+### 1. Criar o arquivo de ambiente do backend
+
+Use como base:
+
+- [backend/.env.example](/Users/user/Workspaces/projects/to-do-list/backend/.env.example)
+
+Exemplo mínimo:
+
+```env
+DEBUG=True
+SECRET_KEY=change-me-in-development
+FRONTEND_URL=http://localhost:3000
+
+DB_NAME=todo_db
+DB_USER=todo_user
+DB_PASSWORD=2004
+DB_HOST=db
+DB_PORT=5432
+
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USE_TLS=True
+EMAIL_HOST_USER=seu_email@gmail.com
+EMAIL_HOST_PASSWORD=sua_senha_de_app
+DEFAULT_FROM_EMAIL=seu_email@gmail.com
+EMAIL_REPLY_TO=seu_email@gmail.com
+```
+
+Crie o arquivo real:
+
+```bash
+cp backend/.env.example backend/.env
+```
+
+### 2. Subir os containers
 
 Na raiz do projeto:
 
@@ -165,19 +127,23 @@ Na raiz do projeto:
 docker compose up --build
 ```
 
-Serviços esperados:
+### 3. Acessar a aplicação
 
-- frontend: `http://localhost:3000`
-- backend: `http://localhost:8000`
-- postgres: `localhost:5433`
+| Serviço | URL |
+| --- | --- |
+| Frontend | [http://localhost:3000](http://localhost:3000) |
+| Backend | [http://localhost:8000](http://localhost:8000) |
+| PostgreSQL | `localhost:5433` |
 
-Observações:
+### Observações importantes
 
-- o backend aplica migrations automaticamente na inicialização
+- o backend executa `migrate` ao iniciar
+- no Docker, o banco deve ser acessado pelo host `db`
 - o frontend em container é servido via Nginx
-- para ambiente com Docker, o banco fica acessível entre containers pelo host `db`
 
-## Como Rodar Localmente Sem Docker
+## Instalação Local Sem Docker
+
+Se você preferir rodar cada parte manualmente, siga a ordem abaixo.
 
 ### 1. Backend
 
@@ -200,15 +166,19 @@ Instale as dependências:
 pip install -r requirements.txt
 ```
 
-Crie um arquivo `.env` em `backend/` com base em:
+Crie o arquivo de ambiente:
 
-- [backend/.env.example](/Users/user/Workspaces/projects/to-do-list/backend/.env.example)
+```bash
+cp .env.example .env
+```
 
-Exemplo:
+Edite o `backend/.env` com seus dados locais. Exemplo:
 
 ```env
 DEBUG=True
 SECRET_KEY=sua-chave-local
+FRONTEND_URL=http://localhost:3000
+
 DB_NAME=todo_db
 DB_USER=todo_user
 DB_PASSWORD=2004
@@ -222,25 +192,15 @@ EMAIL_HOST_USER=seu_email@gmail.com
 EMAIL_HOST_PASSWORD=sua_senha_de_app
 DEFAULT_FROM_EMAIL=seu_email@gmail.com
 EMAIL_REPLY_TO=seu_email@gmail.com
-
-FRONTEND_URL=http://localhost:3000
 ```
 
-Variáveis principais do backend:
-
-- `SECRET_KEY`: chave da aplicação Django
-- `DEBUG`: habilita modo de desenvolvimento
-- `FRONTEND_URL`: usado para montar links enviados por e-mail
-- `DB_*`: conexão com PostgreSQL
-- `EMAIL_*`: configuração SMTP para notificações
-
-Rode as migrations:
+Aplique as migrations:
 
 ```bash
 python manage.py migrate
 ```
 
-Inicie o servidor:
+Inicie a API:
 
 ```bash
 python manage.py runserver
@@ -248,51 +208,19 @@ python manage.py runserver
 
 ### 2. Frontend
 
-Entre na pasta:
+Em outro terminal:
 
 ```bash
 cd frontend
-```
-
-Instale as dependências:
-
-```bash
 pnpm install
+cp .env.example .env.local
 ```
 
-Crie um arquivo `.env.local` com base em:
-
-- [frontend/.env.example](/Users/user/Workspaces/projects/to-do-list/frontend/.env.example)
-
-Exemplo:
+Arquivo esperado:
 
 ```env
 VITE_API_URL=http://localhost:8000/api
 ```
-
-Variável principal do frontend:
-
-- `VITE_API_URL`: URL base da API consumida pelo cliente React
-
-### 3. E2E
-
-Se quiser rodar os testes Selenium localmente, crie `e2e/.env` com base em:
-
-- [e2e/.env.example](/Users/user/Workspaces/projects/to-do-list/e2e/.env.example)
-
-Exemplo:
-
-```env
-E2E_FRONTEND_URL=http://127.0.0.1:3000
-E2E_API_URL=http://127.0.0.1:8000/api
-E2E_WAIT_SECONDS=15
-```
-
-Variáveis principais do E2E:
-
-- `E2E_FRONTEND_URL`: página aberta pelo navegador automatizado
-- `E2E_API_URL`: API auxiliar usada nos testes
-- `E2E_WAIT_SECONDS`: tempo máximo de espera por renderização e redirecionamento
 
 Inicie o frontend:
 
@@ -300,9 +228,88 @@ Inicie o frontend:
 pnpm dev
 ```
 
+### 3. E2E
+
+Se quiser rodar os testes Selenium localmente:
+
+```bash
+pip install -r e2e/requirements.txt
+cp e2e/.env.example e2e/.env
+```
+
+Arquivo esperado:
+
+```env
+E2E_FRONTEND_URL=http://127.0.0.1:3000
+E2E_API_URL=http://127.0.0.1:8000/api
+E2E_WAIT_SECONDS=15
+```
+
+Pré-requisitos adicionais:
+
+- backend rodando
+- frontend rodando
+- Chrome ou Chromium instalado
+- WebDriver compatível disponível no sistema
+
+## Arquivos De Ambiente
+
+Cada parte do projeto possui seu próprio contexto de configuração.
+
+### Backend
+
+Arquivo de exemplo:
+
+- [backend/.env.example](/Users/user/Workspaces/projects/to-do-list/backend/.env.example)
+
+Variáveis principais:
+
+| Variável | Finalidade |
+| --- | --- |
+| `SECRET_KEY` | chave interna do Django |
+| `DEBUG` | modo de desenvolvimento |
+| `FRONTEND_URL` | base usada em links e e-mails |
+| `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT` | conexão com o PostgreSQL |
+| `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_USE_TLS` | configuração SMTP |
+| `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD` | autenticação SMTP |
+| `DEFAULT_FROM_EMAIL`, `EMAIL_REPLY_TO` | remetente e resposta dos e-mails |
+
+### Frontend
+
+Arquivo de exemplo:
+
+- [frontend/.env.example](/Users/user/Workspaces/projects/to-do-list/frontend/.env.example)
+
+Variável principal:
+
+| Variável | Finalidade |
+| --- | --- |
+| `VITE_API_URL` | URL base da API usada pelo React |
+
+### E2E
+
+Arquivo de exemplo:
+
+- [e2e/.env.example](/Users/user/Workspaces/projects/to-do-list/e2e/.env.example)
+
+Variáveis principais:
+
+| Variável | Finalidade |
+| --- | --- |
+| `E2E_FRONTEND_URL` | endereço aberto pelo navegador automatizado |
+| `E2E_API_URL` | API auxiliar usada pelos testes |
+| `E2E_WAIT_SECONDS` | timeout máximo de espera |
+
+### Regras importantes
+
+- arquivos reais de ambiente não devem ser versionados
+- o frontend só deve usar variáveis com prefixo `VITE_`
+- segredos e credenciais ficam apenas no backend
+- para Gmail, use senha de app em vez da senha normal da conta
+
 ## Como Rodar Os Testes
 
-### Backend com pytest
+### Backend
 
 Na pasta `backend`:
 
@@ -326,322 +333,127 @@ pnpm exec eslint src --ext .ts,.tsx
 pnpm build
 ```
 
-### E2E com Selenium
+### E2E
 
-A suíte E2E fica na raiz do projeto:
-
-- [e2e](/Users/user/Workspaces/projects/to-do-list/e2e)
-
-Ela foi mantida fora de `backend/` porque valida o sistema pela interface web completa, e não apenas a API.
-
-Instalação:
-
-```bash
-pip install -r e2e/requirements.txt
-```
-
-Arquivo de exemplo:
-
-- [e2e/.env.example](/Users/user/Workspaces/projects/to-do-list/e2e/.env.example)
-
-Variáveis opcionais:
-
-```env
-E2E_FRONTEND_URL=http://127.0.0.1:3000
-E2E_API_URL=http://127.0.0.1:8000/api
-E2E_WAIT_SECONDS=15
-```
-
-Execução:
+Na raiz do projeto:
 
 ```bash
 python -m pytest e2e/selenium -v
 ```
 
-Pré-requisitos para os testes E2E:
-
-- backend rodando
-- frontend rodando
-- Chrome ou Chromium instalado
-- WebDriver compatível disponível no sistema
-
-## Variáveis De Ambiente
+## Arquitetura E Decisões De Design
 
 ### Backend
 
-Arquivo de exemplo:
+O backend foi separado em apps com responsabilidades claras:
 
-- [backend/.env.example](/Users/user/Workspaces/projects/to-do-list/backend/.env.example)
-
-Variáveis principais:
-
-- `DEBUG`
-- `SECRET_KEY`
-- `FRONTEND_URL`
-- `DB_NAME`
-- `DB_USER`
-- `DB_PASSWORD`
-- `DB_HOST`
-- `DB_PORT`
-- `EMAIL_HOST`
-- `EMAIL_PORT`
-- `EMAIL_USE_TLS`
-- `EMAIL_HOST_USER`
-- `EMAIL_HOST_PASSWORD`
-- `DEFAULT_FROM_EMAIL`
-- `EMAIL_REPLY_TO`
+- `users`: cadastro, login, perfil e preferências de notificação
+- `tasks`: regras de tarefas, compartilhamento, permissões e notificações
+- `categories`: organização das tarefas por categoria
 
 ### Frontend
 
-Arquivo de exemplo:
+O frontend foi dividido em camadas para reduzir acoplamento:
 
-- [frontend/.env.example](/Users/user/Workspaces/projects/to-do-list/frontend/.env.example)
+- `features`: páginas e fluxos principais
+- `components`: componentes visuais e reutilizáveis
+- `hooks`: estado compartilhado e regras de uso
+- `services`: consumo da API
+- `types`: contratos tipados
 
-Variável principal:
+### Decisões principais
 
-- `VITE_API_URL`
+- `DRF + JWT`: autenticação stateless simples para SPA
+- `TaskShare` com permissão `read/edit`: compartilhamento sem duplicar tarefa
+- `SMTP no backend`: protege credenciais e centraliza o envio
+- `settings_test.py`: separa ambiente de teste do ambiente local
+- `pytest + Selenium`: cobre backend e fluxo real de interface
 
-### E2E
+### Princípios adotados
 
-Arquivo de exemplo:
-
-- [e2e/.env.example](/Users/user/Workspaces/projects/to-do-list/e2e/.env.example)
-
-Variáveis principais:
-
-- `E2E_FRONTEND_URL`
-- `E2E_API_URL`
-- `E2E_WAIT_SECONDS`
-
-## CI
-
-Workflow principal:
-
-- [ci.yml](/Users/user/Workspaces/projects/to-do-list/.github/workflows/ci.yml)
-
-O pipeline executa:
-
-- job de backend com PostgreSQL, migrations, pytest e cobertura
-- job E2E com Selenium para frontend
-
-Para disparar no GitHub Actions:
-
-1. faça `git push`
-2. abra a aba `Actions` do repositório
-3. acompanhe os jobs `Pytest` e `Frontend Selenium`
+- `KISS`: fluxo direto para autenticação, tarefas e categorias
+- `DRY`: reaproveitamento de serviços, helpers e serializers
+- `SOLID`: separação entre camada visual, serviço e regra de negócio
 
 ## Rotas Da API
 
-Base da API:
+Base local:
 
 ```text
 http://localhost:8000/api
 ```
 
-### Autenticação e Perfil
+### Autenticação e perfil
 
-Prefixo:
+| Método | Rota | Descrição |
+| --- | --- | --- |
+| `POST` | `/auth/signup/` | cria conta |
+| `POST` | `/auth/signin/` | autentica usuário |
+| `POST` | `/auth/refresh/` | renova token |
+| `GET` | `/auth/profile/` | retorna perfil autenticado |
+| `PATCH` | `/auth/profile/` | atualiza parcialmente o perfil |
+| `PUT` | `/auth/profile/` | atualiza completamente o perfil |
+| `POST` | `/auth/profile/test-notification/` | envia e-mail de teste |
 
-```text
-/api/auth/
-```
+### Categorias
 
-Rotas:
-
-- `POST /auth/signup/`
-  cria uma nova conta
-
-- `POST /auth/signin/`
-  autentica o usuário e retorna tokens JWT
-
-- `POST /auth/refresh/`
-  renova o token de acesso
-
-- `GET /auth/profile/`
-  retorna os dados do usuário autenticado
-
-- `PATCH /auth/profile/`
-  atualiza parcialmente o perfil e preferências de notificação
-
-- `PUT /auth/profile/`
-  atualiza completamente o perfil
-
-- `POST /auth/profile/test-notification/`
-  dispara um e-mail de teste usando a configuração SMTP
-
-Campos relevantes de perfil:
-
-- `username`
-- `email`
-- `first_name`
-- `last_name`
-- `notifications_enabled`
-- `notify_on_task_shared`
-- `notify_on_task_completed`
+| Método | Rota | Descrição |
+| --- | --- | --- |
+| `GET` | `/categories/` | lista categorias do usuário |
+| `POST` | `/categories/` | cria categoria |
+| `GET` | `/categories/{id}/` | detalha categoria |
+| `PUT` | `/categories/{id}/` | atualiza categoria |
+| `PATCH` | `/categories/{id}/` | atualiza parcialmente |
+| `DELETE` | `/categories/{id}/` | remove categoria |
 
 ### Tarefas
 
-Prefixo:
+| Método | Rota | Descrição |
+| --- | --- | --- |
+| `GET` | `/tasks/` | lista tarefas do usuário |
+| `POST` | `/tasks/` | cria tarefa |
+| `GET` | `/tasks/{id}/` | detalha tarefa |
+| `PUT` | `/tasks/{id}/` | atualiza tarefa |
+| `PATCH` | `/tasks/{id}/` | atualiza parcialmente |
+| `DELETE` | `/tasks/{id}/` | remove tarefa |
+| `PATCH` | `/tasks/{id}/toggle/` | alterna concluída / não concluída |
 
-```text
-/api/tasks/
-```
-
-Rotas principais:
-
-- `GET /tasks/`
-  lista tarefas do usuário autenticado
-
-- `POST /tasks/`
-  cria uma tarefa
-
-- `GET /tasks/{id}/`
-  detalha uma tarefa do proprietário
-
-- `PATCH /tasks/{id}/`
-  atualiza parcialmente uma tarefa do proprietário
-
-- `PUT /tasks/{id}/`
-  atualiza totalmente uma tarefa do proprietário
-
-- `DELETE /tasks/{id}/`
-  remove uma tarefa do proprietário
-
-- `PATCH /tasks/{id}/toggle/`
-  alterna o status entre concluída e não concluída
-
-- `GET /tasks/shared-with-me/`
-  lista tarefas compartilhadas com o usuário autenticado
-
-- `PATCH /tasks/{id}/shared-edit/`
-  permite editar tarefa compartilhada quando a permissão for `edit`
-
-Filtros suportados em `GET /tasks/` e `GET /tasks/shared-with-me/`:
+Filtros suportados em `/tasks/`:
 
 - `search`
 - `category`
 - `is_done`
 - `ordering`
 
-Exemplo:
+### Compartilhamento
 
-```text
-/api/tasks/?search=estudo&is_done=false&ordering=-created_at
-```
+| Método | Rota | Descrição |
+| --- | --- | --- |
+| `GET` | `/tasks/{id}/shares/` | lista compartilhamentos da tarefa |
+| `POST` | `/tasks/{id}/shares/` | compartilha tarefa com outro usuário |
+| `DELETE` | `/tasks/{id}/shares/{share_id}/` | remove compartilhamento |
+| `GET` | `/tasks/shared-with-me/` | lista tarefas compartilhadas comigo |
+| `PATCH` | `/tasks/{id}/shared-edit/` | edita tarefa compartilhada quando permitido |
 
-Ordenações aceitas:
+## CI E Automação
 
-- `created_at`
-- `-created_at`
-- `due_date`
-- `-due_date`
-- `title`
-- `-title`
-- `updated_at`
-- `-updated_at`
+Workflows disponíveis:
 
-Paginação:
+- [ci.yml](/Users/user/Workspaces/projects/to-do-list/.github/workflows/ci.yml): pytest, cobertura e Selenium
+- [release.yml](/Users/user/Workspaces/projects/to-do-list/.github/workflows/release.yml): release por tag e publicação de imagens no GHCR
 
-- a API usa paginação global do DRF na configuração principal
-- no ambiente de testes há ajustes específicos para simplificar asserts
+Fluxo de CI:
 
-Campos principais de tarefa:
+1. sobe PostgreSQL no GitHub Actions
+2. instala dependências
+3. aplica migrations
+4. roda `pytest` com cobertura
+5. sobe backend e frontend no job E2E
+6. roda Selenium
 
-- `id`
-- `title`
-- `description`
-- `isDone`
-- `dueDate`
-- `ownerId`
-- `ownerName`
-- `categoryId`
-- `categoryName`
-- `shared`
-- `sharedWith`
-- `sharePermission`
-- `createdAt`
-- `updatedAt`
+Fluxo de release:
 
-### Compartilhamento de Tarefas
-
-Rotas:
-
-- `GET /tasks/{id}/shares/`
-  lista compartilhamentos da tarefa
-
-- `POST /tasks/{id}/shares/`
-  compartilha tarefa com outro usuário
-
-- `DELETE /tasks/{id}/shares/{shareId}/`
-  remove um compartilhamento específico
-
-Formato esperado para compartilhar:
-
-```json
-{
-  "shared_with_username": "usuario_destino",
-  "permission": "read"
-}
-```
-
-Permissões suportadas:
-
-- `read`
-- `edit`
-
-Regras:
-
-- somente o proprietário pode compartilhar ou remover compartilhamentos
-- quem recebe com `read` pode apenas visualizar
-- quem recebe com `edit` pode editar e concluir a tarefa
-
-### Categorias
-
-Prefixo:
-
-```text
-/api/categories/
-```
-
-Rotas:
-
-- `GET /categories/`
-  lista categorias do usuário autenticado
-
-- `POST /categories/`
-  cria categoria
-
-- `GET /categories/{id}/`
-  detalha categoria
-
-- `PATCH /categories/{id}/`
-  atualiza parcialmente categoria
-
-- `PUT /categories/{id}/`
-  atualiza totalmente categoria
-
-- `DELETE /categories/{id}/`
-  remove categoria
-
-Campos principais:
-
-- `id`
-- `owner`
-- `name`
-- `color`
-- `created_at`
-- `updated_at`
-
-## Integração Externa
-
-O projeto possui integração externa de envio de e-mail via SMTP.
-
-Uso atual:
-
-- notificar quando uma tarefa é compartilhada
-- notificar quando uma tarefa compartilhada é concluída
-- enviar e-mail de teste a partir da tela de perfil
-
-Implementação principal:
-
-- [notifications.py](/Users/user/Workspaces/projects/to-do-list/backend/tasks/notifications.py)
+1. criar uma tag como `v1.0.0`
+2. enviar a tag para o GitHub
+3. a workflow cria a release
+4. as imagens Docker são publicadas no GitHub Packages (`ghcr.io`)
