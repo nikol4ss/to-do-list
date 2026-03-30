@@ -11,7 +11,7 @@ env:
 
 jobs:
   test:
-    name: Pytest
+    name: Backend Pytest
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -142,17 +142,17 @@ jobs:
             backend/requirements.txt
             e2e/requirements.txt
 
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version: "22"
           cache: pnpm
           cache-dependency-path: frontend/pnpm-lock.yaml
-
-      - name: Set up pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10
 
       - name: Install backend and E2E dependencies
         run: |
