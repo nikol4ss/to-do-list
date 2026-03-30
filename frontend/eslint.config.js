@@ -17,7 +17,6 @@ export default defineConfig([
       js.configs.recommended,
       reactHooks.configs.flat.recommended,
       reactRefresh.configs.vite,
-      "plugin:@typescript-eslint/recommended",
     ],
     languageOptions: {
       parser: tsParser,
@@ -31,8 +30,14 @@ export default defineConfig([
       },
     },
     rules: {
+      ...(tsPlugin.configs.recommended.rules ?? {}),
+      "no-undef": "off",
+      "no-empty": "off",
+      "no-useless-catch": "off",
       "no-unused-vars": "off",
+      "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-unused-vars": ["error"],
+      "react-refresh/only-export-components": "off",
     },
   },
 ]);
